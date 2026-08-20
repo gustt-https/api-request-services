@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RequestServiceRequest extends FormRequest
+class RegisterDeviceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,14 +23,9 @@ class RequestServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required', 'string'],
-            'latitude' => ['required', 'string'],
-            'longitude' => ['required', 'string'],
-            'cep' => ['required', 'string'],
-            'address' => ['required', 'string'],
-            'address_number' => ['required', 'string'],
-            'complement' => ['required', 'string'],
-            'price' => ['required', 'string']
+            'token' => ['required', 'string'],
+            'plataform' => ['required', 'string'],
+            'device_id' => ['required', 'string']
         ];
     }
 }
