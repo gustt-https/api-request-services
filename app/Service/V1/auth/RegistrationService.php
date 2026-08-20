@@ -13,8 +13,9 @@ class RegistrationService {
         $user->email_verified_at = now();
         $user->save();
 
+        $user->clientProfile()->create();
+
         $token = $user->createToken('mobile', ['server:access'])->plainTextToken;
         return $token;
-        
     }
 }
