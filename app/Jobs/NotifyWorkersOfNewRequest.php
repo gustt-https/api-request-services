@@ -14,17 +14,13 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected string $token)
-    {
-        //
-    }
+    public function __construct(protected RequestService $request){}
 
     /**
      * Execute the job.
      */
-    public function handle(FirebaseService $firebase): void
-    {   
-
-        $firebase->sendPush($this->token);
+    public function handle(FirebaseService $firebase): void {
+        //$firebase->sendNewRequestPush();
     }
+
 }

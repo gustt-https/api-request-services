@@ -18,11 +18,7 @@ class RequestService
     public function makeRequest(User $user, array $payload)
     {
         $request = $user->requests()->create($payload);
-        $device = Device::query()->where('user_id', 1)->first();
-        $token = $device->token;
-        NotifyWorkersOfNewRequest::dispatch($token);
-
-
+        NotifyWorkersOfNewRequest::dispatch($request);
 
         return $request;
     }
