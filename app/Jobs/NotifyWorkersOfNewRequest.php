@@ -7,6 +7,7 @@ use App\Service\V1\firebase\FirebaseService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
+
 class NotifyWorkersOfNewRequest implements ShouldQueue
 {
     use Queueable;
@@ -14,17 +15,13 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected string $token)
-    {
-        //
-    }
+    public function __construct(protected string $request){}
 
     /**
      * Execute the job.
      */
     public function handle(FirebaseService $firebase): void
     {   
-
-        $firebase->sendPush($this->token);
+        
     }
 }
