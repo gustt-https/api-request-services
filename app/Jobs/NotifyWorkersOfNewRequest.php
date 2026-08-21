@@ -27,7 +27,7 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
         $latitude  = $this->request->latitude;
         $longitude = $this->request->longitude;
 
-        $workesInRadius = $this->workers->execute($latitude, $longitude, 5);
+        $workesInRadius = $this->workers->find($latitude, $longitude, 5);
         $data = $this->buildNotificationData();
 
         $firebase->sendNewRequestPush($workesInRadius, $data);
