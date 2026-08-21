@@ -4,7 +4,8 @@ namespace App\Service\V1\auth;
 
 use App\Models\User;
 
-class RegistrationService {
+class RegistrationService
+{
 
     public function register(User $user, string $cpf, string $name): string
     {
@@ -13,9 +14,9 @@ class RegistrationService {
         $user->email_verified_at = now();
         $user->save();
 
-        $user->clientProfile()->create();
+        $user->workerProfile()->create();
 
-        $token = $user->createToken('mobile', ['server:access'])->plainTextToken;
+        $token = $user->createToken('worker', ['server:worker'])->plainTextToken;
         return $token;
     }
 }

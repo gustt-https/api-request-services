@@ -12,7 +12,7 @@ class FirebaseService
 {
     public function __construct(protected Messaging $messaging) {}
 
-    public function sendNewRequestPush(array $tokens, RequestService $request)
+    public function sendNewRequestPush(array $tokens, array $data)
     {
 
         $message = CloudMessage::new()->fromArray([
@@ -20,7 +20,7 @@ class FirebaseService
                 'title' => 'Há um novo serviço para você',
                 'body' => 'Aproveite!'
             ],
-            'data' => new NotifyWorkersRequestResource($request)
+            'data' => $data
         ]);
 
         $this->messaging->sendMulticast($message, $tokens);

@@ -25,8 +25,5 @@ class ClientProfile extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeAvailable($query)
-    {
-        return $query->where('available', true);
-    }
+
 }

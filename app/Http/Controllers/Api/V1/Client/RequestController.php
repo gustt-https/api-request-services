@@ -15,11 +15,12 @@ class RequestController extends Controller
         $user = Auth::user();
         $payload = $request->validated();
 
-        $service->makeRequest($user, $payload);
+        $newRequest =  $service->makeRequest($user, $payload);
 
         return response()->json([
             'success' => true,
             'message' => 'Solicitação criada',
-        ], 200);
+            'data' => $newRequest
+        ], 201);
     }
 }
