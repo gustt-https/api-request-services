@@ -3,17 +3,19 @@
 namespace App\Service\V1\requests;
 
 use App\Models\Device;
+use App\Models\RequestService;
 use App\Models\User;
 use App\Models\WorkerProfile;
 
 class FindNearbyWorkersService
 {
 
-    public function find(float $latitude, float $longitude, float $radius): array
+    public function find(RequestService $request, int $radius): array
     {
         $workersInRadius = WorkerProfile::query()
             ->available()
-            ->withRadius($latitude, $longitude, $radius)
+            ->withRadius($request->latitude, $request->longitude, $radius)
+            ->notAppliedToRequest($request->id)
             ->pluck('user_id');
 
         $tokens = Device::query()

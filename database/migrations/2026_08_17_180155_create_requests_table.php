@@ -23,11 +23,6 @@ return new class extends Migration
             $table->integer('address_number');
             $table->string('complement');
             $table->decimal('price');
-            $table->dateTime('accepted_at')->nullable();
-            $table->dateTime('started_at')->nullable();
-            $table->dateTime('completed_at')->nullable();
-            $table->dateTime('cancelled_at')->nullable();
-            $table->longText('cancellation_reason')->nullable();
             $table->timestamps();
         });
     }

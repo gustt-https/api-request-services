@@ -16,18 +16,17 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected RequestService $request, protected FindNearbyWorkersService $workers) {}
+    public function __construct(protected RequestService $request) {}
 
     /**
      * Execute the job.
      */
 
-    public function handle(FirebaseService $firebase): void
+    public function handle(FirebaseService $firebase, FindNearbyWorkersService $workers): void
     {
-        $latitude  = $this->request->latitude;
-        $longitude = $this->request->longitude;
+   
 
-        $workesInRadius = $this->workers->find($latitude, $longitude, 5);
+        $workesInRadius = $workers->find($this->request, 5);
         $data = $this->buildNotificationData();
 
         $firebase->sendNewRequestPush($workesInRadius, $data);

@@ -37,6 +37,13 @@ class WorkerProfile extends Model
             ->orderBy('distance');
     }
 
+    public function scopeNotAppliedToRequest($query, int $requestId)
+    {
+        return $query->whereDoesntHave('request_applications', function($query) use ($requestId) {
+            $query->where('request_id', $requestId);
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Service\V1\worker;
+
+use App\Exceptions\FailedAcceptRequest;
+use App\Http\Resources\RequestAcceptedResource;
+use App\Models\RequestApplication;
+use App\Models\RequestService;
+use App\Models\User;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
+
+class WorkerAcceptRequestService
+{
+    public function acceptRequest(RequestService $request, User $worker): JsonResource
+    {
+        if ($request->status !== 'searching') {
+            throw new FailedAcceptRequest();
+        }
+
+        $acceptedRequest =  DB::transaction(function () use ($request, $worker) {
+            $request->lockForUpdate();
+            $request->worker_id = $worker->id;
+            $request->accepted_at = now();
+            $request->status = 'accepted';
+            $request->save();
+
+            $application = new RequestApplication();
+            $application->request_id = $request->id;
+            $application->worker_id = $worker->id;
+            $application->status = 'accepted';
+            $application->accepted_at = now();
+            $application->save();
+
+            return $request->load(['user']);
+        });
+
+        return new RequestAcceptedResource($acceptedRequest);
+    }
+}
