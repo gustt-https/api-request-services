@@ -25,7 +25,6 @@ class WorkerAvailabilityRequest extends FormRequest
         return [
             'latitude' => ['required', 'string'],
             'longitude' => ['required', 'string'],
-            'available' => ['required', 'boolean']
         ];
     }
 }

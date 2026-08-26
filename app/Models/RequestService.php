@@ -19,9 +19,23 @@ class RequestService extends Model
         'price',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'accepted_at' => 'datetime',
+            'started_at' => 'datetime',
+            'completed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+        ];
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function worker()
+    {
+        return $this->belongsTo(User::class, 'worker_id');
     }
 }

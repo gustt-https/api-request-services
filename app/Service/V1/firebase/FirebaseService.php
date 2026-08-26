@@ -2,8 +2,6 @@
 
 namespace App\Service\V1\firebase;
 
-use App\Http\Resources\NotifyWorkersRequestResource;
-use App\Models\RequestService;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
 

@@ -22,7 +22,8 @@ class RequestResource extends JsonResource
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
                 'address' => $this->address,
-                'number' => $this->number,
+                // Ajustado: a coluna é address_number, não number.
+                'number' => $this->address_number,
                 'complement' => $this->complement
             ],
             'price' => $this->price,

@@ -4,7 +4,7 @@ namespace App\Service\V1\auth;
 
 use App\Models\User;
 
-class RegistrationService
+class RegistrationClientService
 {
 
     public function register(User $user, string $cpf, string $name): string
@@ -16,7 +16,8 @@ class RegistrationService
 
         $user->clientProfile()->create();
 
-        $token = $user->createToken('client', ['server:client'])->plainTextToken;
+        // Ajustado: inclui server:access — as rotas autenticadas exigem essa ability, não só server:client.
+        $token = $user->createToken('client', ['server:access', 'server:client'])->plainTextToken;
         return $token;
     }
 

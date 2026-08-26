@@ -24,7 +24,8 @@ class VerificationCodeService
             throw new InvalidEmailCode();
         }
 
-        Cache::clear();
+        // Ajustado: Cache::clear() apagava o cache inteiro; aqui só o código deste e-mail.
+        Cache::forget('email-code:' . $email);
 
         $user = User::query()->where('email', $email)->first();
 

@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
-use App\Service\V1\auth\RegistrationService;
-
+use App\Service\V1\auth\RegistrationClientService;
+use App\Service\V1\auth\RegistrationWorkerService;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function clientRegister(RegistrationRequest $request, RegistrationService $user)
+    public function clientRegister(RegistrationRequest $request, RegistrationClientService $user)
     {
 
         $cpf = $request->input('cpf');
@@ -27,7 +27,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function workerRegister(RegistrationRequest $request, RegistrationService $user)
+    public function workerRegister(RegistrationRequest $request, RegistrationWorkerService $user)
     {
         $cpf = $request->input('cpf');
         $name = $request->input('name');

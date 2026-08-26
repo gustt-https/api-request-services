@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('requests', function (Blueprint $table) {
-            $table->removeColumn('cep');
+            // Ajustado: Schema não tem removeColumn — o método correto é dropColumn.
+            $table->dropColumn('cep');
         });
     }
 };

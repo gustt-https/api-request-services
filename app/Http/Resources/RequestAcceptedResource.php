@@ -23,7 +23,6 @@ class RequestAcceptedResource extends JsonResource
                 'name' => $this->user->name
             ],
             'service' => [
-                'type' => $this->type,
                 'description' => $this->description
             ],
             'location' => [
@@ -31,7 +30,8 @@ class RequestAcceptedResource extends JsonResource
                 'longitude' => $this->longitude,
                 'address' => $this->address
             ],
-            'value' => $this->value,
+            // Ajustado: requests tem price, não type/value.
+            'value' => $this->price,
             'accepted_at' => $this->accepted_at
         ];
     }

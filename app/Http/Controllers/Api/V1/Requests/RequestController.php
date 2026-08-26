@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Requests;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RequestServiceRequest;
 use App\Http\Resources\RequestResource;
+use App\Models\RequestService as RequestServiceModel;
 use App\Service\V1\requests\RequestService;
-use Illuminate\Support\Facades\Auth;
 
 class RequestController extends Controller
 {
-
-    public function show(RequestService $request)
+    // Ajustado: type-hint no model (alias) — RequestService sozinho era o service, não o registro.
+    public function show(RequestServiceModel $requestService)
     {
         return response()->json([
-            'data' => new RequestResource($request)
+            'data' => new RequestResource($requestService)
         ]);
     }
 

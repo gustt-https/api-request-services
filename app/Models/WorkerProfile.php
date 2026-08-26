@@ -39,7 +39,7 @@ class WorkerProfile extends Model
 
     public function scopeNotAppliedToRequest($query, int $requestId)
     {
-        return $query->whereDoesntHave('request_applications', function($query) use ($requestId) {
+        return $query->whereDoesntHave('requestApplications', function ($query) use ($requestId) {
             $query->where('request_id', $requestId);
         });
     }
@@ -47,5 +47,11 @@ class WorkerProfile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Ajustado: o scope usava request_applications, mas a relation não existia.
+    public function requestApplications()
+    {
+        return $this->hasMany(RequestApplication::class, 'worker_id', 'user_id');
     }
 }

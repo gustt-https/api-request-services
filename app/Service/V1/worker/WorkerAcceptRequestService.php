@@ -14,12 +14,16 @@ class WorkerAcceptRequestService
 {
     public function acceptRequest(RequestService $request, User $worker): JsonResource
     {
-        if ($request->status !== 'searching') {
-            throw new FailedAcceptRequest();
-        }
+        $acceptedRequest = DB::transaction(function () use ($request, $worker) {
+            $request = RequestService::query()
+                ->whereKey($request->id)
+                ->lockForUpdate()
+                ->first();
 
-        $acceptedRequest =  DB::transaction(function () use ($request, $worker) {
-            $request->lockForUpdate();
+            if (!$request || $request->status !== 'searching') {
+                throw new FailedAcceptRequest();
+            }
+
             $request->worker_id = $worker->id;
             $request->accepted_at = now();
             $request->status = 'accepted';
