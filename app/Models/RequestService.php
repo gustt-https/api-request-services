@@ -34,6 +34,11 @@ class RequestService extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function securityCode()
+    {
+        return $this->hasOne(ServiceSecurityCode::class);
+    }
+
     public function worker()
     {
         return $this->belongsTo(User::class, 'worker_id');

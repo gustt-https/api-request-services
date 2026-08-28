@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Models\RequestService;
+use App\Service\V1\worker\GetCurrentWorkerService;
 use App\Service\V1\worker\WorkerAcceptRequestService;
 use App\Service\V1\worker\WorkerCancelRequestService;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,6 @@ class WorkerController extends Controller
         ]);
     }
 
-    // Ajustado: a rota já apontava para cancel, mas o método não existia.
     public function cancel(RequestService $requestService, WorkerCancelRequestService $workerService)
     {
         $worker = Auth::user();
@@ -32,6 +32,15 @@ class WorkerController extends Controller
             'success' => true,
             'message' => 'Requisição cancelada com sucesso.',
             'data' => $cancelledRequest
+        ]);
+    }
+
+    public function current(GetCurrentWorkerService $CurrentWorkerService)
+    {
+        $worker = Auth::user();
+
+        return response()->json([
+            'data' => $CurrentWorkerService->execute($worker)
         ]);
     }
 }

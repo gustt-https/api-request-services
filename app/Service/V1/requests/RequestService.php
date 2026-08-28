@@ -12,12 +12,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class RequestService
 {
 
-    public function __construct(protected FirebaseService $firebase) {}
+    public function __construct(
+        protected FirebaseService $firebase,
+        protected GenerateSecurityCodeService $generateCode
+    ) {}
 
     public function makeRequest(User $user, array $payload): JsonResource
     {
         $request = $user->requests()->create($payload);
         NotifyWorkersOfNewRequest::dispatch($request);
+        
+        $this->generateCode->execute($request);
 
         return new RequestResource($request);
     }
