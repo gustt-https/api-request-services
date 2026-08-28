@@ -2,43 +2,41 @@
 
 namespace App\Service\V1\worker;
 
-use App\Exceptions\FailedCancelRequestService;
+use App\Exceptions\requests\ApplicationNotFound;
+use App\Exceptions\requests\FailedCancelRequestService;
 use App\Http\Resources\RequestResource;
 use App\Jobs\NotifyWorkersOfNewRequest;
-use App\Models\RequestService;
+use App\Models\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class WorkerCancelRequestService
 {
-    public function cancelRequest(RequestService $request, User $worker)
+    public function cancelRequest(Request $request, User $worker)
     {
         $cancelledRequest = DB::transaction(function () use ($request, $worker) {
-            $request = RequestService::query()
+            $lockRequest = Request::query()
                 ->whereKey($request->id)
                 ->lockForUpdate()
                 ->first();
+                
+            $application = $lockRequest->activeApplication();
 
-            if ($request->worker_id !== $worker->id) {
-                throw new FailedCancelRequestService();
+            if (!$application) {
+                throw new ApplicationNotFound();
             }
-
-            $request->worker_id = null;
-            $request->status = 'searching';
-            $request->accepted_at = null;
-            $request->save();
-
-            $application = $worker->application()
-                ->where('request_id', $request->id)
-                ->whereNull('cancelled_at')
-                ->latest('id')
-                ->first();
 
             $application->status = 'cancelled';
             $application->cancelled_at = now();
             $application->save();
 
-            return $request->refresh();
+            $lockRequest->worker_id = null;
+            $lockRequest->status = 'searching';
+            $lockRequest->accepted_at = null;
+            $lockRequest->save();
+
+
+            return $lockRequest->refresh();
         });
 
         NotifyWorkersOfNewRequest::dispatch($cancelledRequest);

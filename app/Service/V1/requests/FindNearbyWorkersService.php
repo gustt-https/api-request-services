@@ -3,14 +3,14 @@
 namespace App\Service\V1\requests;
 
 use App\Models\Device;
-use App\Models\RequestService;
-use App\Models\User;
+use App\Models\Request;
 use App\Models\WorkerProfile;
+use Illuminate\Support\Collection;
 
 class FindNearbyWorkersService
 {
 
-    public function find(RequestService $request, int $radius): array
+    public function find(Request $request, int $radius): Collection
     {
         $workersInRadius = WorkerProfile::query()
             ->available()
@@ -18,11 +18,10 @@ class FindNearbyWorkersService
             ->notAppliedToRequest($request->id)
             ->pluck('user_id');
 
-        $tokens = Device::query()
+        $devices = Device::query()
             ->whereIn('user_id', $workersInRadius)
-            ->pluck('token')
-            ->toArray();
+            ->get();
 
-        return $tokens;
+        return $devices;
     }
 }

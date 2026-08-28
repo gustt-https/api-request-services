@@ -32,7 +32,8 @@ class RequestResource extends JsonResource
                 "started_at" => $this->started_at,
                 "completed_at" => $this->completed_at,
                 "cancelled_at" => $this->cancelled_at
-            ]
+            ],
+            'security_code' => $this->when(isset($this->additional['code']), $this->additional['code'])
         ];
     }
 }

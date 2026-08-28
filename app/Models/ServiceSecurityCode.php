@@ -15,6 +15,6 @@ class ServiceSecurityCode extends Model
 
     public function request()
     {
-        return $this->belongsTo(RequestService::class);
+        return $this->belongsTo(Request::class);
     }
 }

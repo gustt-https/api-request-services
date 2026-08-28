@@ -55,7 +55,7 @@ class User extends Authenticatable
 
     public function requests()
     {
-        return $this->hasMany(RequestService::class);
+        return $this->hasMany(Request::class);
     }
 
     public function clientProfile()

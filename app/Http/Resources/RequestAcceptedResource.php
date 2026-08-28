@@ -30,9 +30,8 @@ class RequestAcceptedResource extends JsonResource
                 'longitude' => $this->longitude,
                 'address' => $this->address
             ],
-            // Ajustado: requests tem price, não type/value.
             'value' => $this->price,
-            'accepted_at' => $this->accepted_at
+            'accepted_at' => $this->accepted_at,
         ];
     }
 }

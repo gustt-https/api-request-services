@@ -2,25 +2,25 @@
 
 namespace App\Service\V1\worker;
 
-use App\Exceptions\FailedAcceptRequest;
+use App\Exceptions\requests\FailedAcceptRequest;
 use App\Http\Resources\RequestAcceptedResource;
 use App\Models\RequestApplication;
-use App\Models\RequestService;
+use App\Models\Request;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 
 class WorkerAcceptRequestService
 {
-    public function acceptRequest(RequestService $request, User $worker): JsonResource
+    public function acceptRequest(Request $request, User $worker): JsonResource
     {
         $acceptedRequest = DB::transaction(function () use ($request, $worker) {
-            $request = RequestService::query()
+            $request = Request::query()
                 ->whereKey($request->id)
                 ->lockForUpdate()
                 ->first();
 
-            if (!$request || $request->status !== 'searching') {
+            if ($request->status !== 'searching') {
                 throw new FailedAcceptRequest();
             }
 

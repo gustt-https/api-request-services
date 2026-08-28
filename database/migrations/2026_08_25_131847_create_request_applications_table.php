@@ -16,13 +16,11 @@ return new class extends Migration
             $table->foreignId('request_id')->constrained('requests');
             // Ajustado: users.user_id não existe — a PK é id.
             $table->foreignId('worker_id')->constrained('users');
-            $table->string('status');
             $table->timestamp('accepted_at')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();
             $table->longText('cancellation_reason')->nullable();
-            // Ajustado: o model usa timestamps padrão do Eloquent.
             $table->timestamps();
         });
     }

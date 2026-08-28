@@ -2,9 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Models\RequestService;
+use App\Models\Request;
 use App\Service\V1\firebase\FirebaseService;
 use App\Service\V1\requests\FindNearbyWorkersService;
+use App\Service\V1\requests\SaveWorkersNotifiedService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -13,23 +14,29 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(protected RequestService $request) {}
+    public function __construct(
+        protected Request $request
+    ) {}
 
-    /**
-     * Execute the job.
-     */
 
-    public function handle(FirebaseService $firebase, FindNearbyWorkersService $workers): void
-    {
-   
+    public function handle(
+        FirebaseService $firebase,
+        FindNearbyWorkersService $workers,
+        SaveWorkersNotifiedService $saveWorkersNotified
+    ): void {
 
         $workesInRadius = $workers->find($this->request, 5);
         $data = $this->buildNotificationData();
 
-        $firebase->sendNewRequestPush($workesInRadius, $data);
+        $firebase->sendNewRequestPush(
+            $workesInRadius,
+            $data
+        );
+
+        $saveWorkersNotified->execute(
+            $this->request,
+            $workesInRadius
+        );
     }
 
     private function buildNotificationData()

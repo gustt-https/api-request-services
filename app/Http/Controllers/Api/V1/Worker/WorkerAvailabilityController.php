@@ -24,7 +24,6 @@ class WorkerAvailabilityController extends Controller
         ]);
     }
 
-    // Ajustado: a rota já apontava para disabled, mas o método não existia.
     public function disabled(Request $request, WorkerAvailabilityService $workerService)
     {
         $workerService->disabled($request->user());

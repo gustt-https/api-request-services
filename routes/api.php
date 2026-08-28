@@ -21,13 +21,16 @@ Route::prefix('v1')->group(function () {
         Route::post('/devices', [DeviceController::class, 'register']);
 
         Route::post('/requests', [RequestController::class, 'store']);
-        Route::get('/requests/{requestService}', [RequestController::class, 'show']);
+        Route::get('/requests/{request}', [RequestController::class, 'show']);
+        Route::get('/requests/{request}/worker/preview', [RequestController::class, 'preview']);
+        
 
         Route::post('/worker/availability/enable', [WorkerAvailabilityController::class, 'enable']);
         Route::post('/worker/availability/disabled', [WorkerAvailabilityController::class, 'disabled']);
-        Route::post('/worker/request/{requestService}/accept', [WorkerController::class, 'accept']);
-        Route::post('/worker/request/{requestService}/cancel', [WorkerController::class, 'cancel']);
-
         Route::get('/worker/current-service', [WorkerController::class, 'current']);
+        Route::post('/worker/request/{request}/accept', [WorkerController::class, 'accept']);
+        Route::post('/worker/request/{request}/start', [WorkerController::class, 'start']);
+        Route::post('/worker/request/{request}/finish', [WorkerController::class, 'finish']);
+        Route::post('/worker/request/{request}/cancel', [WorkerController::class, 'cancel']);
     });
 });
