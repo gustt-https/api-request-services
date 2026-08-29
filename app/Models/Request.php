@@ -19,20 +19,11 @@ class Request extends Model
         'price',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'accepted_at' => 'datetime',
-            'started_at' => 'datetime',
-            'completed_at' => 'datetime',
-            'cancelled_at' => 'datetime',
-        ];
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
 
     public function securityCode()
     {
@@ -56,9 +47,7 @@ class Request extends Model
 
     public function activeApplication(): ?RequestApplication
     {
-        if (
-            !$this->worker_id
-        ) {
+        if (!$this->worker_id) {
             return null;
         }
 
@@ -67,6 +56,31 @@ class Request extends Model
             ->whereNull('cancelled_at')
             ->latest('id')
             ->first();
+    }
+
+    public function completedRequests(User $user)
+    {
+        return $this->where('worker_id', $user->id)
+            ->where('status', 'completed')
+            ->get();
+    }
+
+    /**
+     * Lifecycle dates live on request_applications; request only has created_at.
+     *
+     * @return array{created_at: mixed, accepted_at: mixed, started_at: mixed, completed_at: mixed, cancelled_at: mixed}
+     */
+    public function lifecycleTimestamps(): array
+    {
+        $application = $this->activeApplication();
+
+        return [
+            'created_at' => $this->created_at,
+            'accepted_at' => $application?->accepted_at,
+            'started_at' => $application?->started_at,
+            'completed_at' => $application?->completed_at,
+            'cancelled_at' => $application?->cancelled_at,
+        ];
     }
 
     public function workersWasNotified(User $user): bool

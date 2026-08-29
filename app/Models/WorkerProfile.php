@@ -8,6 +8,10 @@ class WorkerProfile extends Model
 {
     protected $table = 'worker_profiles';
 
+    protected $casts = [
+        'available' => 'boolean'
+    ];
+
     public function scopeAvailable($query)
     {
         return $query->where('available', true);

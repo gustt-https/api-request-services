@@ -25,14 +25,12 @@ class WorkerAcceptRequestService
             }
 
             $request->worker_id = $worker->id;
-            $request->accepted_at = now();
             $request->status = 'accepted';
             $request->save();
 
             $application = new RequestApplication();
             $application->request_id = $request->id;
             $application->worker_id = $worker->id;
-            $application->status = 'accepted';
             $application->accepted_at = now();
             $application->save();
 

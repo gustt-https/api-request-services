@@ -45,6 +45,10 @@ class RequestPolicy
         return $request->workersWasNotified($user) && $request->status === 'searching';
     }
 
+    public function start(User $user, Request $request)
+    {
+        return $request->worker_id === $user->id;
+    }
 
 
     /**

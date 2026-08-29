@@ -19,21 +19,19 @@ class RequestResource extends JsonResource
             'status' => $this->status,
             'description' => $this->description,
             'location' => [
-                'latitude' => $this->latitude,
-                'longitude' => $this->longitude,
+                'latitude' => (string) $this->latitude,
+                'longitude' => (string) $this->longitude,
                 'address' => $this->address,
-                'number' => $this->address_number,
-                'complement' => $this->complement
+                'number' => $this->address_number !== null ? (string) $this->address_number : null,
+                'cep' => $this->cep,
+                'complement' => $this->complement,
             ],
-            'price' => $this->price,
-            'timestamps' => [
-                "created_at" => $this->created_at,
-                "accepted_at" => $this->accepted_at,
-                "started_at" => $this->started_at,
-                "completed_at" => $this->completed_at,
-                "cancelled_at" => $this->cancelled_at
-            ],
-            'security_code' => $this->when(isset($this->additional['code']), $this->additional['code'])
+            'price' => (string) $this->price,
+            'timestamps' => $this->lifecycleTimestamps(),
+            'security_code' => $this->when(
+                isset($this->additional['code']),
+                fn () => $this->additional['code'],
+            ),
         ];
     }
 }

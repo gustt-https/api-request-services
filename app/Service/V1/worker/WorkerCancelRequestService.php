@@ -26,13 +26,11 @@ class WorkerCancelRequestService
                 throw new ApplicationNotFound();
             }
 
-            $application->status = 'cancelled';
             $application->cancelled_at = now();
             $application->save();
 
             $lockRequest->worker_id = null;
             $lockRequest->status = 'searching';
-            $lockRequest->accepted_at = null;
             $lockRequest->save();
 
 

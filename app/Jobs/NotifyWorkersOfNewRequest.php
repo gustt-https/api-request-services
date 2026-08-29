@@ -8,7 +8,7 @@ use App\Service\V1\requests\FindNearbyWorkersService;
 use App\Service\V1\requests\SaveWorkersNotifiedService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-
+use Throwable;
 
 class NotifyWorkersOfNewRequest implements ShouldQueue
 {
@@ -18,32 +18,36 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
         protected Request $request
     ) {}
 
-
     public function handle(
-        FirebaseService $firebase,
         FindNearbyWorkersService $workers,
-        SaveWorkersNotifiedService $saveWorkersNotified
+        SaveWorkersNotifiedService $saveWorkersNotified,
     ): void {
+        $devices = $workers->find($this->request, 5);
 
-        $workesInRadius = $workers->find($this->request, 5);
-        $data = $this->buildNotificationData();
+        // Persist first — preview policy requires the notification row even if FCM fails.
+        if ($devices->isNotEmpty()) {
+            $saveWorkersNotified->execute($this->request, $devices);
+        }
 
-        $firebase->sendNewRequestPush(
-            $workesInRadius,
-            $data
-        );
+        if ($devices->isEmpty()) {
+            return;
+        }
 
-        $saveWorkersNotified->execute(
-            $this->request,
-            $workesInRadius
-        );
+        try {
+            app(FirebaseService::class)->sendNewRequestPush(
+                $devices,
+                $this->buildNotificationData(),
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
-    private function buildNotificationData()
+    private function buildNotificationData(): array
     {
         return [
             'type' => 'new_request',
-            'request_id' => (string) $this->request->id
+            'request_id' => (string) $this->request->id,
         ];
     }
 }

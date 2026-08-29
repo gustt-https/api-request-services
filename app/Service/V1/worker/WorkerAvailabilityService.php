@@ -2,7 +2,9 @@
 
 namespace App\Service\V1\worker;
 
+use App\Http\Resources\WorkerAvailibilityResource;
 use App\Models\User;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class WorkerAvailabilityService
 {
@@ -22,5 +24,10 @@ class WorkerAvailabilityService
         $profile = $worker->workerProfile;
         $profile->available = false;
         $profile->save();
+    }
+
+    public function currentAvailability(User $worker): ?JsonResource
+    {
+        return new WorkerAvailibilityResource($worker->workerProfile);
     }
 }

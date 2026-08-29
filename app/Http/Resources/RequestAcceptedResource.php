@@ -31,7 +31,7 @@ class RequestAcceptedResource extends JsonResource
                 'address' => $this->address
             ],
             'value' => $this->price,
-            'accepted_at' => $this->accepted_at,
+            'accepted_at' => $this->activeApplication()?->accepted_at,
         ];
     }
 }

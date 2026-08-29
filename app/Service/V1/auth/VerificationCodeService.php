@@ -29,15 +29,20 @@ class VerificationCodeService
 
         $user = User::query()->where('email', $email)->first();
 
-        if (!$user) {
+        // Incomplete signup: the first verify creates the user row, but name/CPF
+        // were never finished. Keep issuing registration tokens until that happens.
+        if (!$user || blank($user->name)) {
+            if (!$user) {
+                $user = User::create([
+                    'email' => $email,
+                    'password' => Str::random(64),
+                    'email_verified_at' => now(),
+                ]);
+            }
 
-            $userCreated = User::create([
-                'email' => $email,
-                'password' => Str::random(64),
-                'email_verified_at' => now()
-            ]);
-
-            $registrationToken = $userCreated->createToken('registration', ['server:registration'], now()->addMinutes(15))->plainTextToken;
+            $registrationToken = $user
+                ->createToken('registration', ['server:registration'], now()->addMinutes(15))
+                ->plainTextToken;
 
             throw new NewUserException($registrationToken);
         }
