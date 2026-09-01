@@ -15,7 +15,10 @@ class SendEmailCodeService
     {
         $code = random_int(100000, 999999);
 
-        Cache::put('email-code:' . $email, Hash::make($code), 900);
+        $cacheKey = "email-code:" . $email;
+        $cacheData = ['code' => Hash::make($code), 'attempts' => 3];
+
+        Cache::put($cacheKey, $cacheData, 900);
 
         Mail::to($email)->send(new VerificationCodeMail($code));
         return true;

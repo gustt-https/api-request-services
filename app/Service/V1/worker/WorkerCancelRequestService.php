@@ -2,6 +2,7 @@
 
 namespace App\Service\V1\worker;
 
+use App\Enums\RequestStatus;
 use App\Exceptions\requests\ApplicationNotFound;
 use App\Exceptions\requests\FailedCancelRequestService;
 use App\Http\Resources\RequestResource;
@@ -30,7 +31,7 @@ class WorkerCancelRequestService
             $application->save();
 
             $lockRequest->worker_id = null;
-            $lockRequest->status = 'searching';
+            $lockRequest->status = RequestStatus::SEARCHING;
             $lockRequest->save();
 
 

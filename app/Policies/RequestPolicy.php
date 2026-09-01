@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\RequestStatus;
 use App\Models\Request;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -27,7 +28,9 @@ class RequestPolicy
 
     public function accept(User $user, Request $request): bool
     {
-        return $request->worker_id === $user->id;
+        return $request->workersWasNotified($user)
+            && $user->application()->where('request_id', $request->id)->doesntExist()
+            && $request->status === RequestStatus::SEARCHING;
     }
 
     public function finish(User $user, Request $request): bool
@@ -42,7 +45,9 @@ class RequestPolicy
 
     public function preview(User $user, Request $request): bool
     {
-        return $request->workersWasNotified($user) && $request->status === 'searching';
+        return $request->workersWasNotified($user)
+            && $user->application()->where('request_id', $request->id)->doesntExist()
+            && $request->status === RequestStatus::SEARCHING;
     }
 
     public function start(User $user, Request $request)

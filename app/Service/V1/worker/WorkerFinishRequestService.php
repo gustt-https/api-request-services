@@ -2,6 +2,7 @@
 
 namespace App\Service\V1\worker;
 
+use App\Enums\RequestStatus;
 use App\Exceptions\requests\ApplicationNotFound;
 use App\Exceptions\requests\WorkerNotAssignedToRequest;
 use App\Http\Resources\RequestResource;
@@ -21,12 +22,12 @@ class WorkerFinishRequestService
                 ->first();
 
             if (
-                $lockRequest->status !== 'in_progress'
+                $lockRequest->status !== RequestStatus::IN_PROGRESS
             ) {
                 throw new ApplicationNotFound();
             }
 
-            $lockRequest->status = 'completed';
+            $lockRequest->status = RequestStatus::COMPLETED;
             $lockRequest->save();
 
             $application = $lockRequest->activeApplication();

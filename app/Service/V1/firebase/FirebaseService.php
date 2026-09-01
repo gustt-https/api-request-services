@@ -13,16 +13,18 @@ class FirebaseService
     public function __construct(protected Messaging $messaging) {}
 
     public function sendNewRequestPush(Collection $devices, array $data): bool
-    {   
-
+    {
         $tokens = $devices
             ->pluck('token')
             ->toArray();
 
+        if (empty($tokens)) {
+            return false;
+        }
+
         $message = CloudMessage::new()->fromArray([
             'notification' => [
-                'title' => 'Há um novo serviço para você',
-                'body' => 'Aproveite!'
+                'body' => 'Novo pedido disponível na sua região'
             ],
             'data' => $data
         ]);

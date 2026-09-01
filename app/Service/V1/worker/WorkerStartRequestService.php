@@ -2,6 +2,7 @@
 
 namespace App\Service\V1\worker;
 
+use App\Enums\RequestStatus;
 use App\Exceptions\requests\ApplicationNotFound;
 use App\Exceptions\requests\InvalidSecurityCode;
 use App\Exceptions\requests\RequestNotAccepted;
@@ -26,7 +27,7 @@ class WorkerStartRequestService
                 ->lockForUpdate()
                 ->first();
 
-            if ($requestLock->status !== 'accepted') {
+            if ($requestLock->status !== RequestStatus::ACCEPTED) {
                 throw new RequestNotAccepted();
             }
 
@@ -49,7 +50,7 @@ class WorkerStartRequestService
             $securiyCode->used_at = now();
             $securiyCode->save();
 
-            $requestLock->status = 'in_progress';
+            $requestLock->status = RequestStatus::IN_PROGRESS;
             $requestLock->save();
 
             $application = $requestLock->activeApplication();

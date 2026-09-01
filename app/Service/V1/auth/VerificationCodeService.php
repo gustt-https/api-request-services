@@ -23,14 +23,7 @@ class VerificationCodeService
         if (!Hash::check($code, $codeSaved)) {
             throw new InvalidEmailCode();
         }
-
-        // Ajustado: Cache::clear() apagava o cache inteiro; aqui só o código deste e-mail.
-        Cache::forget('email-code:' . $email);
-
         $user = User::query()->where('email', $email)->first();
-
-        // Incomplete signup: the first verify creates the user row, but name/CPF
-        // were never finished. Keep issuing registration tokens until that happens.
         if (!$user || blank($user->name)) {
             if (!$user) {
                 $user = User::create([
@@ -47,7 +40,9 @@ class VerificationCodeService
             throw new NewUserException($registrationToken);
         }
 
-        $token = $user->createToken('mobile', ['server:access'])->plainTextToken;
+
+
+        $token = $user->createToken('mobile', ['mobile-app'])->plainTextToken;
         return $token;
     }
 }

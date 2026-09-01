@@ -24,7 +24,6 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
     ): void {
         $devices = $workers->find($this->request, 5);
 
-        // Persist first — preview policy requires the notification row even if FCM fails.
         if ($devices->isNotEmpty()) {
             $saveWorkersNotified->execute($this->request, $devices);
         }
