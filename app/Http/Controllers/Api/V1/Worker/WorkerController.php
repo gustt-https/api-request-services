@@ -31,6 +31,9 @@ class WorkerController extends Controller
         Request $requestService,
         WorkerAcceptRequestService $workerService
     ) {
+
+        $this->authorize('accept', $requestService);
+
         $worker = Auth::user();
         $acceptedRequest = $workerService->acceptRequest($requestService, $worker);
 

@@ -18,6 +18,10 @@ class SaveWorkersNotifiedService
             'notified_at' => now()
         ])->toArray();
 
-        RequestNotification::insert($workersNotifiedColletct);
+        RequestNotification::upsert(
+            $workersNotifiedColletct,
+            ['worker_id', 'request_id'],
+            ['notified_at', 'status']
+        );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Service\V1\worker;
 
+use App\Enums\RequestStatus;
 use App\Exceptions\requests\FailedAcceptRequest;
 use App\Http\Resources\RequestAcceptedResource;
 use App\Models\RequestApplication;
@@ -20,12 +21,12 @@ class WorkerAcceptRequestService
                 ->lockForUpdate()
                 ->first();
 
-            if ($request->status !== 'searching') {
+            if ($request->status !== RequestStatus::SEARCHING) {
                 throw new FailedAcceptRequest();
             }
 
             $request->worker_id = $worker->id;
-            $request->status = 'accepted';
+            $request->status = RequestStatus::ACCEPTED;
             $request->save();
 
             $application = new RequestApplication();

@@ -48,6 +48,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function identityVerification()
+    {
+        return $this->hasOne(WorkerIdentityVerification::class);
+    }
+
     public function devices()
     {
         return $this->hasMany(Device::class);
@@ -62,14 +67,15 @@ class User extends Authenticatable
     {
         return $this->hasOne(ClientProfile::class);
     }
-    
+
     public function workerProfile()
     {
         return $this->hasOne(WorkerProfile::class);
     }
 
 
-    public function application(){
+    public function application()
+    {
         return $this->hasMany(RequestApplication::class, 'worker_id');
     }
 }
