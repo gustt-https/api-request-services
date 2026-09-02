@@ -58,4 +58,9 @@ class WorkerProfile extends Model
     {
         return $this->hasMany(RequestApplication::class, 'worker_id', 'user_id');
     }
+
+    public function identityVerification()
+    {
+        return $this->hasOne(WorkerIdentityVerification::class, 'worker_profile_id');
+    }
 }

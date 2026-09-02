@@ -50,7 +50,14 @@ class User extends Authenticatable
 
     public function identityVerification()
     {
-        return $this->hasOne(WorkerIdentityVerification::class);
+        return $this->hasOneThrough(
+            WorkerIdentityVerification::class,
+            WorkerProfile::class,
+            'user_id',
+            'worker_profile_id',
+            'id',
+            'id'
+        );
     }
 
     public function devices()

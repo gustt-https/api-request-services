@@ -8,41 +8,47 @@ use App\Exceptions\IdentityVerificationPendingException;
 use App\Http\Requests\WorkerIdentityVerificationRequest;
 use App\Http\Resources\SubmitIdentityVerificationResource;
 use App\Models\User;
+use App\Models\WorkerIdentityVerification;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SubmitIdentityVerificationService
 {
-    public function execute(User $user, WorkerIdentityVerificationRequest $request): ?JsonResource
+    public function execute(User $user, WorkerIdentityVerificationRequest $request): JsonResource
     {
-        if (
-            // Feito troca para enuns
-            $user->identityVerification?->status === IdentityVerificationStatus::PENDING
-        ) {
+        $profile = $user->workerProfile;
+
+        if (!$profile) {
+            throw new HttpException(403, 'Perfil de profissional não encontrado.');
+        }
+
+        $existing = $profile->identityVerification;
+
+        if ($existing?->status === IdentityVerificationStatus::PENDING) {
             throw new IdentityVerificationPendingException();
         }
 
-        if (
-            // Feito troca para enuns
-            $user->identityVerification?->status === IdentityVerificationStatus::APPROVED
-        ) {
+        if ($existing?->status === IdentityVerificationStatus::APPROVED) {
             throw new IdentityAlreadyApprovedException();
         }
 
-        $documentFrontPath = Storage::put('documents', $request->file('document_front'));
-        $documentVersePath = Storage::put('documents', $request->file('document_verse'));
-        $selfiePath = Storage::put('documents', $request->file('selfie'));
+        $documentFrontPath = Storage::disk('local')->put('documents', $request->file('document_front'));
+        $documentVersePath = Storage::disk('local')->put('documents', $request->file('document_verse'));
+        $selfiePath = Storage::disk('local')->put('documents', $request->file('selfie'));
 
-        // Para mvp manter assim, futuramente tabela de submissoes: By: Gustavo.
-        $identity = $user->identityVerification()->updateOrCreate(
-            ['user_id' => $user->id],
+        $identity = WorkerIdentityVerification::query()->updateOrCreate(
+            ['worker_profile_id' => $profile->id],
             [
                 'document_type' => $request->input('document_type'),
                 'document_number' => $request->input('document_number'),
-                'document_front_photo_path' => $documentFrontPath,
-                'document_verse_photo_path' => $documentVersePath,
-                'selfie_photo_path' => $selfiePath,
-                'status' => IdentityVerificationStatus::PENDING
+                'front_path' => $documentFrontPath,
+                'back_path' => $documentVersePath,
+                'selfie_path' => $selfiePath,
+                'status' => IdentityVerificationStatus::PENDING,
+                'submitted_at' => now(),
+                'rejection_reason' => null,
+                'reviewed_at' => null,
             ]
         );
 

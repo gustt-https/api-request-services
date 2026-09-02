@@ -16,8 +16,8 @@ class SubmitIdentityVerificationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'status' => $this->status,
-            'submitted_at' => $this->created_at
+            'status' => $this->status?->value ?? $this->status,
+            'submitted_at' => $this->submitted_at ?? $this->created_at,
         ];
     }
 }

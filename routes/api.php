@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Auth\SendVerificationCodeController;
 use App\Http\Controllers\Api\V1\Auth\VerificationCodeController;
 use App\Http\Controllers\Api\V1\DeviceController;
 use App\Http\Controllers\Api\V1\Identity\IdentityController;
+use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\Requests\RequestController;
 use App\Http\Controllers\Api\V1\Worker\WorkerAvailabilityController;
 use App\Http\Controllers\Api\V1\Worker\WorkerController;
@@ -19,6 +20,7 @@ Route::prefix('v1')->group(function () {
     Route::post('worker/auth/register', [AuthController::class, 'workerRegister'])->middleware('auth:sanctum', 'abilities:server:registration');
 
     Route::post('/devices', [DeviceController::class, 'register'])->middleware('auth:sanctum');
+    Route::get('/me', MeController::class)->middleware('auth:sanctum');
 
     Route::prefix('client')
         ->middleware(['auth:sanctum', 'client'])

@@ -15,7 +15,7 @@ class IdentityController extends Controller
 
         return response()->json([
             'message' => 'Documentos enviados para verificação com sucesso.',
-            'data' => $data
+            'data' => $data->resolve(),
         ]);
 
     }
