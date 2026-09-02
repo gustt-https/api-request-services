@@ -14,12 +14,7 @@ class VerificationCodeController extends Controller
         $email = $request->input('email');
         $code = $request->input('code');
 
-        try {
-            $token = $auth->verifyCode($email, $code);
-        } catch (NewUserException $exception) {
-            // Return explicitly so clients always get action/token (not a 500 debug payload).
-            return $exception->render();
-        }
+        $token = $auth->verifyCode($email, $code);
 
         return response()->json([
             'success' => true,

@@ -15,9 +15,16 @@ class AuthController extends Controller
 
         $cpf = $request->input('cpf');
         $name = $request->input('name');
+        $email = $request->attributes->get('email');
 
-        $authUser = Auth::user();
-        $token = $user->register($authUser, $cpf, $name);
+        $payload =
+            [
+                'email' => $email,
+                'cpf' => $cpf,
+                'name' => $name
+            ];
+
+        $token = $user->register($payload);
 
         return response()->json([
             'success' => true,

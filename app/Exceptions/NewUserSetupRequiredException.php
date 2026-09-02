@@ -4,8 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 
-
-class NewUserException extends Exception
+class NewUserSetupRequiredException extends Exception
 {
     public function __construct(protected string $token)
     {
@@ -15,10 +14,8 @@ class NewUserException extends Exception
     public function render()
     {
         return response()->json([
-            'success' => true,
-            'action' => 'NEW_USER',
-            'message' => $this->getMessage(),
-            'token' => $this->token
+            'authenticated' => false,
+            'registration_token' => $this->token
         ]);
     }
 }

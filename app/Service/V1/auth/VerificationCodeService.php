@@ -4,6 +4,7 @@ namespace App\Service\V1\auth;
 
 use App\Exceptions\InvalidEmailCode;
 use App\Exceptions\NewUserException;
+use App\Exceptions\NewUserSetupRequiredException;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -24,23 +25,16 @@ class VerificationCodeService
             throw new InvalidEmailCode();
         }
         $user = User::query()->where('email', $email)->first();
-        if (!$user || blank($user->name)) {
-            if (!$user) {
-                $user = User::create([
-                    'email' => $email,
-                    'password' => Str::random(64),
-                    'email_verified_at' => now(),
-                ]);
-            }
 
-            $registrationToken = $user
-                ->createToken('registration', ['server:registration'], now()->addMinutes(15))
-                ->plainTextToken;
+        if (
+            !$user
+        ) {
 
-            throw new NewUserException($registrationToken);
+            $registrationToken = Str::random(64);
+            Cache::put('registration-token' . $registrationToken, '', 300);
+
+            throw new NewUserSetupRequiredException($registrationToken);
         }
-
-
 
         $token = $user->createToken('mobile', ['mobile-app'])->plainTextToken;
         return $token;
