@@ -15,14 +15,7 @@ class EnsureIsWorker
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
-
-        if (!$user->workerProfile) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Você não tem o perfil necessario'
-            ], 403);
-        }
+        $request->user()->ensureWorkerProfile();
 
         return $next($request);
     }

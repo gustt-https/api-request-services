@@ -15,15 +15,7 @@ class EnsureIsClient
      */
     public function handle(Request $request, Closure $next): Response
     {
-
-        $user = $request->user();
-
-        if (!$user->clientProfile) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Você não tem o perfil necessario'
-            ], 403);
-        }
+        $request->user()->ensureClientProfile();
 
         return $next($request);
     }

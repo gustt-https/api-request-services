@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use Carbon\Carbon;
+use App\Service\V1\auth\VerificationCodeService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -25,17 +25,22 @@ class RegistrationTokenMiddleware
             ], 403);
         }
 
-        $validToken = Cache::get('registration-token:' . $registrationToken);
+        $email = Cache::get(VerificationCodeService::registrationTokenKey($registrationToken));
 
-        if (!$validToken) {
-
+        if (!$email) {
             return response()->json([
                 'message' => 'Token invalido'
             ], 403);
         }
 
-        $request->attributes->set('email', $validToken);
-        
-        return $next($request);
+        $request->attributes->set('email', $email);
+
+        $response = $next($request);
+
+        if ($response->getStatusCode() < 400) {
+            Cache::forget(VerificationCodeService::registrationTokenKey($registrationToken));
+        }
+
+        return $response;
     }
 }

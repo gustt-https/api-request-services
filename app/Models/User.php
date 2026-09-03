@@ -22,6 +22,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'cpf',
         'password',
     ];
 
@@ -78,6 +79,16 @@ class User extends Authenticatable
     public function workerProfile()
     {
         return $this->hasOne(WorkerProfile::class);
+    }
+
+    public function ensureWorkerProfile(): WorkerProfile
+    {
+        return $this->workerProfile()->firstOrCreate([]);
+    }
+
+    public function ensureClientProfile(): ClientProfile
+    {
+        return $this->clientProfile()->firstOrCreate([]);
     }
 
 

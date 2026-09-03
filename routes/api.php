@@ -16,8 +16,11 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/send-code', SendVerificationCodeController::class);
     Route::post('/auth/verify-code', VerificationCodeController::class);
 
-    Route::post('client/auth/register', [AuthController::class, 'clientRegister'])->middleware('auth:sanctum', 'abilities:server:registration');
-    Route::post('worker/auth/register', [AuthController::class, 'workerRegister'])->middleware('auth:sanctum', 'abilities:server:registration');
+    Route::middleware(['registration'])->group(function () {
+        Route::post('client/auth/register', [AuthController::class, 'clientRegister']);
+        Route::post('worker/auth/register', [AuthController::class, 'workerRegister']);
+    });
+
 
     Route::post('/devices', [DeviceController::class, 'register'])->middleware('auth:sanctum');
     Route::get('/me', MeController::class)->middleware('auth:sanctum');

@@ -3,21 +3,30 @@
 namespace App\Service\V1\auth;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class RegistrationWorkerService
 {
-
-    public function register(User $user, string $cpf, string $name): string
+    public function register(array $payload): string
     {
-        $user->cpf = $cpf;
-        $user->name = $name;
+        $user = User::query()->firstOrCreate(
+            ['email' => $payload['email']],
+            [
+                'name' => $payload['name'],
+                'cpf' => $payload['cpf'],
+                'password' => Str::random(32),
+            ]
+        );
+
+        $user->name = $payload['name'];
+        $user->cpf = $payload['cpf'];
         $user->email_verified_at = now();
         $user->save();
 
-        $user->workerProfile()->create();
+        if (!$user->workerProfile) {
+            $user->workerProfile()->create();
+        }
 
-        // Ajustado: inclui server:access — as rotas autenticadas exigem essa ability, não só server:worker.
-        $token = $user->createToken('worker', ['server:access', 'server:worker'])->plainTextToken;
-        return $token;
+        return $user->createToken('mobile-app')->plainTextToken;
     }
 }

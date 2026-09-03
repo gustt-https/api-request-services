@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
 use App\Service\V1\auth\RegistrationClientService;
 use App\Service\V1\auth\RegistrationWorkerService;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -38,9 +37,15 @@ class AuthController extends Controller
     {
         $cpf = $request->input('cpf');
         $name = $request->input('name');
+        $email = $request->attributes->get('email');
 
-        $authUser = Auth::user();
-        $token = $user->register($authUser, $cpf, $name);
+        $payload = [
+            'email' => $email,
+            'cpf' => $cpf,
+            'name' => $name,
+        ];
+
+        $token = $user->register($payload);
 
         return response()->json([
             'success' => true,
