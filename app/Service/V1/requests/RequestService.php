@@ -2,6 +2,7 @@
 
 namespace App\Service\V1\requests;
 
+use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\RequestResource;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\User;
@@ -18,6 +19,12 @@ class RequestService
 
     public function makeRequest(User $user, array $payload): JsonResource
     {
+        if (
+            $user->hasActiveService()
+        ) {
+            throw new ActiveServiceAlreadyExists();
+        }
+
         $request = $user->requests()->create($payload);
         NotifyWorkersOfNewRequest::dispatch($request);
 

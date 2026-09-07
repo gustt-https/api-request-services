@@ -2,8 +2,8 @@
 
 namespace App\Service\V1\auth;
 
-use App\Exceptions\InvalidEmailCode;
-use App\Exceptions\NewUserSetupRequiredException;
+use App\Exceptions\Auth\InvalidEmailCode;
+use App\Exceptions\Auth\NewUserSetupRequiredException;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;

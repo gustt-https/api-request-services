@@ -3,7 +3,7 @@
 namespace App\Service\V1\worker;
 
 use App\Enums\RequestStatus;
-use App\Exceptions\requests\FailedAcceptRequest;
+use App\Exceptions\Requests\FailedAcceptRequest;
 use App\Http\Resources\RequestAcceptedResource;
 use App\Models\RequestApplication;
 use App\Models\Request;

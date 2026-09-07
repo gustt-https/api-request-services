@@ -30,6 +30,8 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::post('/requests', [RequestController::class, 'store']);
             Route::get('/requests/{requestService}', [RequestController::class, 'show']);
+            Route::get('/requests', [RequestController::class, 'index']);
+            
         });
 
 

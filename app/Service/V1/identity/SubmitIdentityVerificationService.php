@@ -3,15 +3,15 @@
 namespace App\Service\V1\identity;
 
 use App\Enums\IdentityVerificationStatus;
-use App\Exceptions\IdentityAlreadyApprovedException;
-use App\Exceptions\IdentityVerificationPendingException;
+use App\Exceptions\Identity\IdentityAlreadyApprovedException;
+use App\Exceptions\Identity\IdentityVerificationPendingException;
+use App\Exceptions\Identity\WorkerProfileNotFound;
 use App\Http\Requests\WorkerIdentityVerificationRequest;
 use App\Http\Resources\SubmitIdentityVerificationResource;
 use App\Models\User;
 use App\Models\WorkerIdentityVerification;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SubmitIdentityVerificationService
 {
@@ -20,7 +20,7 @@ class SubmitIdentityVerificationService
         $profile = $user->workerProfile;
 
         if (!$profile) {
-            throw new HttpException(403, 'Perfil de profissional não encontrado.');
+            throw new WorkerProfileNotFound();
         }
 
         $existing = $profile->identityVerification;

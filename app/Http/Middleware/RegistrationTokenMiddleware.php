@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\Auth\RegistrationTokenInvalidException;
 use App\Service\V1\auth\VerificationCodeService;
 use Closure;
 use Illuminate\Http\Request;
@@ -20,17 +21,13 @@ class RegistrationTokenMiddleware
         $registrationToken = $request->bearerToken();
 
         if (!$registrationToken) {
-            return response()->json([
-                'message' => 'Token não fornecido ou invalido'
-            ], 403);
+            throw new RegistrationTokenInvalidException();
         }
 
         $email = Cache::get(VerificationCodeService::registrationTokenKey($registrationToken));
 
         if (!$email) {
-            return response()->json([
-                'message' => 'Token invalido'
-            ], 403);
+            throw new RegistrationTokenInvalidException();
         }
 
         $request->attributes->set('email', $email);

@@ -3,8 +3,7 @@
 namespace App\Service\V1\worker;
 
 use App\Enums\RequestStatus;
-use App\Exceptions\requests\ApplicationNotFound;
-use App\Exceptions\requests\FailedCancelRequestService;
+use App\Exceptions\Requests\ApplicationNotFound;
 use App\Http\Resources\RequestResource;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\Request;

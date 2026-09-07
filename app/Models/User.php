@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\IdentityVerificationStatus;
+use App\Enums\RequestStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,6 +64,12 @@ class User extends Authenticatable
         );
     }
 
+    public function identityIsVerified(): bool
+    {
+        return $this->identityVerification?->status === IdentityVerificationStatus::APPROVED;
+    }
+
+
     public function devices()
     {
         return $this->hasMany(Device::class);
@@ -74,6 +83,15 @@ class User extends Authenticatable
     public function clientProfile()
     {
         return $this->hasOne(ClientProfile::class);
+    }
+
+    public function hasActiveService(): bool
+    {
+        return $this->requests()->whereIn('status', [
+            RequestStatus::IN_PROGRESS,
+            RequestStatus::ACCEPTED
+        ])
+            ->exists();
     }
 
     public function workerProfile()

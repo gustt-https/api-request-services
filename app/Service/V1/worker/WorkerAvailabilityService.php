@@ -2,6 +2,7 @@
 
 namespace App\Service\V1\worker;
 
+use App\Exceptions\Identity\IdentityIsNotVerified;
 use App\Http\Resources\WorkerAvailibilityResource;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -9,7 +10,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class WorkerAvailabilityService
 {
     public function enable(User $worker, string $latitude, string $longitude): void
-    {
+    {   
+
+        if (! $worker->identityIsVerified()) {
+            throw new IdentityIsNotVerified($worker->identityVerification?->status);
+        }
+
         $profile = $worker->workerProfile;
 
         $profile->latitude = $latitude;

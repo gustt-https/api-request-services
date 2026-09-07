@@ -12,7 +12,6 @@ class GetCurrentWorkerService
 {
     public function execute(User $worker): ?JsonResource
     {
-        // Status lives on requests; lifecycle dates live on request_applications.
         $currentService = Request::query()
             ->where('worker_id', $worker->id)
             ->whereIn('status', [

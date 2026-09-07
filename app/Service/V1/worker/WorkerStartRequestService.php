@@ -3,12 +3,11 @@
 namespace App\Service\V1\worker;
 
 use App\Enums\RequestStatus;
-use App\Exceptions\requests\ApplicationNotFound;
-use App\Exceptions\requests\InvalidSecurityCode;
-use App\Exceptions\requests\RequestNotAccepted;
-use App\Exceptions\requests\SecurityCodeAlreadyUsed;
-use App\Exceptions\requests\SecurityCodeNotFound;
-use App\Exceptions\requests\WorkerNotAssignedToRequest;
+use App\Exceptions\Requests\ApplicationNotFound;
+use App\Exceptions\Requests\InvalidSecurityCode;
+use App\Exceptions\Requests\RequestNotAccepted;
+use App\Exceptions\Requests\SecurityCodeAlreadyUsed;
+use App\Exceptions\Requests\SecurityCodeNotFound;
 use App\Http\Resources\RequestResource;
 use App\Models\Request;
 use App\Models\User;
