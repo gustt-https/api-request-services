@@ -16,22 +16,27 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/send-code', SendVerificationCodeController::class);
     Route::post('/auth/verify-code', VerificationCodeController::class);
 
-    Route::middleware(['registration'])->group(function () {
-        Route::post('client/auth/register', [AuthController::class, 'clientRegister']);
-        Route::post('worker/auth/register', [AuthController::class, 'workerRegister']);
-    });
+    Route::middleware(['auth:sanctum'])
+        ->group(function () {
+            Route::post('/devices', [DeviceController::class, 'register']);
+            Route::get('/me', MeController::class);
+        });
 
+    Route::middleware(['registration'])
+        ->group(function () {
+            Route::post('client/auth/register', [AuthController::class, 'clientRegister']);
+            Route::post('worker/auth/register', [AuthController::class, 'workerRegister']);
+        });
 
-    Route::post('/devices', [DeviceController::class, 'register'])->middleware('auth:sanctum');
-    Route::get('/me', MeController::class)->middleware('auth:sanctum');
 
     Route::prefix('client')
         ->middleware(['auth:sanctum', 'client'])
         ->group(function () {
-            Route::post('/requests', [RequestController::class, 'store']);
-            Route::get('/requests/{requestService}', [RequestController::class, 'show']);
             Route::get('/requests', [RequestController::class, 'index']);
-            
+            Route::post('/requests', [RequestController::class, 'store']);
+            Route::get('/requests/current', [RequestController::class, 'current']);
+            Route::get('/requests/{requestService}', [RequestController::class, 'show']);
+            Route::post('/request/{requestService}/cancel', [RequestController::class, 'cancel']);
         });
 
 

@@ -43,6 +43,15 @@ class RequestPolicy
         return $request->worker_id === $user->id;
     }
 
+    public function cancelByClient(User $user, Request $request)
+    {
+        return $request->user_id === $user->id
+            && in_array($request->status, [
+                RequestStatus::ACCEPTED,
+                RequestStatus::SEARCHING
+            ], true);
+    }
+
     public function preview(User $user, Request $request): bool
     {
         return $request->workersWasNotified($user)

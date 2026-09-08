@@ -109,7 +109,6 @@ class User extends Authenticatable
         return $this->clientProfile()->firstOrCreate([]);
     }
 
-
     public function application()
     {
         return $this->hasMany(RequestApplication::class, 'worker_id');

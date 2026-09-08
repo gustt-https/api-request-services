@@ -60,7 +60,7 @@ class Request extends Model
             ->where('request_id', $this->id)
             ->whereNull('cancelled_at')
             ->latest('id')
-            ->firstOrFail();
+            ->first();
     }
 
     public function completedRequests(User $user)

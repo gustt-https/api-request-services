@@ -18,6 +18,10 @@ class RequestResource extends JsonResource
             'id' => $this->id,
             'status' => $this->status,
             'description' => $this->description,
+            'worker' => $this->when($this->worker_id !== null, fn() => [
+                'id' => $this->worker->id,
+                'name' => $this->worker->name
+            ]),
             'location' => [
                 'latitude' => (string) $this->latitude,
                 'longitude' => (string) $this->longitude,
@@ -30,8 +34,9 @@ class RequestResource extends JsonResource
             'timestamps' => $this->lifecycleTimestamps(),
             'security_code' => $this->when(
                 isset($this->additional['code']),
-                fn () => $this->additional['code'],
+                fn() => $this->additional['code'],
             ),
+
         ];
     }
 }
