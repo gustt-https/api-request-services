@@ -49,11 +49,12 @@ Route::prefix('v1')->group(function () {
             Route::post('/availability/disabled', [WorkerAvailabilityController::class, 'disabled']);
             Route::get('/current-service', [WorkerController::class, 'current']);
             Route::post('/request/{requestService}/accept', [WorkerController::class, 'accept']);
-            Route::post('/request/{requestService}/start', [WorkerController::class, 'start']);
+            Route::post('/request/{requestService}/start', [WorkerController::class, 'start'])->middleware('throttle.start');
             Route::post('/request/{requestService}/finish', [WorkerController::class, 'finish']);
             Route::post('/request/{requestService}/cancel', [WorkerController::class, 'cancel']);
             Route::get('/requests/{requestService}/preview', [RequestController::class, 'preview']);
             Route::get('/services', [WorkerController::class, 'index']);
             Route::post('/identity-verification', [IdentityController::class, 'submit']);
+            Route::post('/profile-photo', [WorkerController::class, 'profilePhoto']);
         });
 });

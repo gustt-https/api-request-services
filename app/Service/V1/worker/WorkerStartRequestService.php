@@ -8,6 +8,7 @@ use App\Exceptions\Requests\InvalidSecurityCode;
 use App\Exceptions\Requests\RequestNotAccepted;
 use App\Exceptions\Requests\SecurityCodeAlreadyUsed;
 use App\Exceptions\Requests\SecurityCodeNotFound;
+use App\Exceptions\Requests\WorkerNotAssignedToRequest;
 use App\Http\Resources\RequestResource;
 use App\Jobs\NotifyClientServiceStarted;
 use App\Models\Request;
@@ -28,6 +29,12 @@ class WorkerStartRequestService
 
             if ($requestLock->status !== RequestStatus::ACCEPTED) {
                 throw new RequestNotAccepted();
+            }
+
+            if (
+                $requestLock->worker_id !== $worker->id
+            ) {
+                throw new WorkerNotAssignedToRequest();
             }
 
             $securiyCode = $requestLock->securityCode()

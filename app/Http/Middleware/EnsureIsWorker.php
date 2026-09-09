@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\Profile\WorkerProfileNotFound;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,11 @@ class EnsureIsWorker
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $request->user()->ensureWorkerProfile();
+        $user = $request->user();
+
+        if (!$user->workerProfile) {
+            throw new WorkerProfileNotFound();
+        }
 
         return $next($request);
     }

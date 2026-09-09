@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\Profile\ClientProfileNotFound;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,11 @@ class EnsureIsClient
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $request->user()->ensureClientProfile();
+        $user = $request->user();
+
+        if (!$user->clientProfile) {
+            throw new ClientProfileNotFound();
+        }
 
         return $next($request);
     }

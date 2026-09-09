@@ -16,6 +16,7 @@ class FindNearbyWorkersService
             ->available()
             ->withRadius($request->latitude, $request->longitude, $radius)
             ->notAppliedToRequest($request->id)
+            ->where('user_id', '!=', $request->user_id)
             ->pluck('user_id');
 
         $userIds = $workersInRadius

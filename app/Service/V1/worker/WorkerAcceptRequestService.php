@@ -46,10 +46,10 @@ class WorkerAcceptRequestService
             $application->accepted_at = now();
             $application->save();
 
-            NotifyClientWorkerAccepted::dispatch($lockRequest);
             return $lockRequest->load(['user']);
         });
 
+        NotifyClientWorkerAccepted::dispatch($acceptedRequest);
         return new RequestAcceptedResource($acceptedRequest);
     }
 }

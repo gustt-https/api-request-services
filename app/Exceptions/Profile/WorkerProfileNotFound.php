@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Exceptions\Identity;
+namespace App\Exceptions\Profile;
 
 use App\Exceptions\DomainException;
 
 class WorkerProfileNotFound extends DomainException
 {
-    public function __construct()
+    public function __construct(?string $message = null)
     {
         parent::__construct(
-            message: 'Não foi possível enviar a verificação de identidade.',
+            message: $message ?? 'Perfil de profissional não encontrado.',
             status: 403,
         );
     }

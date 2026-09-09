@@ -4,6 +4,8 @@ namespace App\Service\V1\worker;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\Requests\ApplicationNotFound;
+use App\Exceptions\Requests\FailedCancelRequest;
+use App\Exceptions\Requests\WorkerNotAssignedToRequest;
 use App\Http\Resources\RequestResource;
 use App\Jobs\NotifyClientWorkerCancelled;
 use App\Jobs\NotifyWorkersOfNewRequest;
@@ -20,7 +22,15 @@ class WorkerCancelRequestService
                 ->whereKey($request->id)
                 ->lockForUpdate()
                 ->first();
-                
+
+            if ($lockRequest->worker_id !== $worker->id) {
+                throw new WorkerNotAssignedToRequest();
+            }
+
+            if ($lockRequest->status !== RequestStatus::ACCEPTED) {
+                throw new FailedCancelRequest();
+            }
+
             $application = $lockRequest->activeApplication();
 
             if (!$application) {
@@ -33,7 +43,6 @@ class WorkerCancelRequestService
             $lockRequest->worker_id = null;
             $lockRequest->status = RequestStatus::SEARCHING;
             $lockRequest->save();
-
 
             return $lockRequest->refresh();
         });

@@ -4,6 +4,7 @@ use App\Exceptions\DomainException;
 use App\Http\Middleware\EnsureIsClient;
 use App\Http\Middleware\EnsureIsWorker;
 use App\Http\Middleware\RegistrationTokenMiddleware;
+use App\Http\Middleware\RequestStartThrottle;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -29,7 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'ability' => CheckForAnyAbility::class,
             'worker' => EnsureIsWorker::class,
             'client' => EnsureIsClient::class,
-            'registration' => RegistrationTokenMiddleware::class
+            'registration' => RegistrationTokenMiddleware::class,
+            'throttle.start' => RequestStartThrottle::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

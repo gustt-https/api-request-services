@@ -10,9 +10,9 @@ class RegisterDeviceAction
     public function handle(array $data)
     {
         $device = Device::updateOrCreate(
-            ['device_id' => $data['device_id']],
+            ['user_id' => Auth::id()],
             [
-                'user_id' => Auth::id(),
+                'device_id' => $data['device_id'],
                 'token' => $data['token'],
                 'plataform' => $data['plataform'],
                 'is_active' => true,

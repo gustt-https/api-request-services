@@ -47,21 +47,14 @@ class MeResource extends JsonResource
         ];
     }
 
-    /** Selfie URL when identity is approved and the file exists on disk. */
-    private function avatarUrl(): ?string
+    private function avatarUrl()
     {
-        $identity = $this->workerProfile?->identityVerification;
+        $path = $this->workerProfile?->profile_photo;
 
-        if ($identity?->status?->value !== 'approved') {
+        if (!$path) {
             return null;
         }
 
-        $path = $identity->selfie_path ?? $identity->selfie_photo_path ?? null;
-
-        if (!$path || !Storage::disk('local')->exists($path)) {
-            return null;
-        }
-
-        return Storage::disk('local')->temporaryUrl($path, now()->addHours(6));
+        return Storage::disk('public')->url($path);
     }
 }

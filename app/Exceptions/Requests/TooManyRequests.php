@@ -4,13 +4,13 @@ namespace App\Exceptions\Requests;
 
 use App\Exceptions\DomainException;
 
-class FailedCancelRequest extends DomainException
+class TooManyRequests extends DomainException
 {
     public function __construct(?string $message = null)
     {
         parent::__construct(
-            message: $message ?? 'Não foi possível cancelar esta solicitação.',
-            status: 409,
+            message: $message ?? 'Muitas tentativas. Aguarde um momento e tente novamente.',
+            status: 429,
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Service\V1\worker;
 
 use App\Exceptions\Identity\IdentityIsNotVerified;
+use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\WorkerAvailibilityResource;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,6 +28,7 @@ class WorkerAvailabilityService
 
     public function disabled(User $worker): void
     {
+
         $profile = $worker->workerProfile;
         $profile->available = false;
         $profile->save();

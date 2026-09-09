@@ -5,7 +5,7 @@ namespace App\Service\V1\identity;
 use App\Enums\IdentityVerificationStatus;
 use App\Exceptions\Identity\IdentityAlreadyApprovedException;
 use App\Exceptions\Identity\IdentityVerificationPendingException;
-use App\Exceptions\Identity\WorkerProfileNotFound;
+use App\Exceptions\Profile\WorkerProfileNotFound;
 use App\Http\Requests\WorkerIdentityVerificationRequest;
 use App\Http\Resources\SubmitIdentityVerificationResource;
 use App\Models\User;
