@@ -94,4 +94,23 @@ class Request extends Model
             ->where('worker_id', $user->id)
             ->exists();
     }
+
+    public function plaintextSecurityCodeFor(?User $user): ?string
+    {
+        if (! $user || $user->id !== $this->user_id) {
+            return null;
+        }
+
+        if (! in_array($this->status, [RequestStatus::SEARCHING, RequestStatus::ACCEPTED], true)) {
+            return null;
+        }
+
+        $securityCode = $this->securityCode;
+
+        if (! $securityCode || $securityCode->used_at !== null) {
+            return null;
+        }
+
+        return (string) $securityCode->code;
+    }
 }

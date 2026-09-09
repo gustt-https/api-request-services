@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Storage;
 class MeResource extends JsonResource
 {
     /**
+     * @param  array{services_completed: int, total_earned: string}|null  $workerStats
+     */
+    public function __construct(
+        $resource,
+        private ?array $workerStats = null,
+    ) {
+        parent::__construct($resource);
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
@@ -24,9 +34,11 @@ class MeResource extends JsonResource
             'email' => $this->email,
             'cpf' => $this->cpf,
             'avatar_url' => $this->avatarUrl(),
+            'member_since' => $this->created_at?->toIso8601String(),
             'worker' => $worker ? [
                 'available' => (bool) $worker->available,
                 'profile_status' => $worker->profile_status,
+                'stats' => $this->workerStats,
                 'identity' => $identity ? [
                     'status' => $identity->status?->value ?? $identity->status,
                     'rejection_reason' => $identity->rejection_reason,

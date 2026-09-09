@@ -88,9 +88,21 @@ class User extends Authenticatable
     public function hasActiveService(): bool
     {
         return $this->requests()->whereIn('status', [
+            RequestStatus::SEARCHING,
+            RequestStatus::ACCEPTED,
             RequestStatus::IN_PROGRESS,
-            RequestStatus::ACCEPTED
         ])
+            ->exists();
+    }
+
+    public function hasActiveWorkerService(): bool
+    {
+        return Request::query()
+            ->where('worker_id', $this->id)
+            ->whereIn('status', [
+                RequestStatus::ACCEPTED,
+                RequestStatus::IN_PROGRESS,
+            ])
             ->exists();
     }
 

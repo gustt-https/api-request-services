@@ -27,6 +27,6 @@ class RegistrationWorkerService
             $user->workerProfile()->create();
         }
 
-        return $user->createToken('mobile-app')->plainTextToken;
+        return $user->createToken('mobile', ['mobile-app'])->plainTextToken;
     }
 }

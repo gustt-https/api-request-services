@@ -5,6 +5,7 @@ namespace App\Service\V1\requests;
 use App\Enums\RequestStatus;
 use App\Exceptions\Requests\ApplicationNotFound;
 use App\Http\Resources\RequestResource;
+use App\Jobs\NotifyWorkerClientCancelled;
 use App\Models\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,9 @@ class CancelRequest
 {
     public function execute(Request $request, string $reasonCancellation)
     {
-        $cancelledRequest =  DB::transaction(function () use ($request, $reasonCancellation) {
+        $assignedWorkerId = null;
+
+        $cancelledRequest =  DB::transaction(function () use ($request, $reasonCancellation, &$assignedWorkerId) {
             $lockedRequest = $request->newQuery()
                 ->whereKey($request->id)
                 ->lockForUpdate()
@@ -23,6 +26,8 @@ class CancelRequest
                 // Implementar uma exception aqui... por enquanto manter
                 //(Implementar penalidade para cancelamento de requests em andamento)
             }
+
+            $assignedWorkerId = $lockedRequest->worker_id;
 
             $activeApplication = $lockedRequest->activeApplication();
 
@@ -40,6 +45,10 @@ class CancelRequest
 
             return $lockedRequest->refresh();
         });
+
+        if ($assignedWorkerId) {
+            NotifyWorkerClientCancelled::dispatch($cancelledRequest, $assignedWorkerId);
+        }
 
         return new RequestResource($cancelledRequest);
     }

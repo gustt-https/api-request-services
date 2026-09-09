@@ -9,21 +9,15 @@ use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class NotifyClientWorkerAccepted implements ShouldQueue
+class NotifyClientWorkerCancelled implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(protected Request $request)
     {
         //
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(
         FindClientOfRequest $client,
     ): void {
@@ -40,7 +34,7 @@ class NotifyClientWorkerAccepted implements ShouldQueue
         $data = $this->buildNotificationData();
 
         try {
-            app(FirebaseService::class)->notifyClientWorkerAccepted($devices, $data);
+            app(FirebaseService::class)->notifyClientWorkerCancelled($devices, $data);
         } catch (
             Exception $e
         ) {
@@ -51,7 +45,7 @@ class NotifyClientWorkerAccepted implements ShouldQueue
     private function buildNotificationData()
     {
         return [
-            'type' => 'request_accepted',
+            'type' => 'request_cancelled_by_worker',
             'request_id' => $this->request->id
         ];
     }

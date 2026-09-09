@@ -14,10 +14,19 @@ class RequestResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $code = $this->plaintextSecurityCodeFor($request->user());
+
         return [
             'id' => $this->id,
             'status' => $this->status,
             'description' => $this->description,
+            'client' => $this->when(
+                $request->user()?->id === $this->worker_id,
+                fn () => [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name,
+                ],
+            ),
             'worker' => $this->when($this->worker_id !== null, fn() => [
                 'id' => $this->worker->id,
                 'name' => $this->worker->name
@@ -32,11 +41,7 @@ class RequestResource extends JsonResource
             ],
             'price' => (string) $this->price,
             'timestamps' => $this->lifecycleTimestamps(),
-            'security_code' => $this->when(
-                isset($this->additional['code']),
-                fn() => $this->additional['code'],
-            ),
-
+            'security_code' => $this->when($code !== null, $code),
         ];
     }
 }

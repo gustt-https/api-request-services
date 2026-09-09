@@ -3,6 +3,7 @@
 namespace App\Service\V1\worker;
 
 use App\Enums\RequestStatus;
+use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Exceptions\Requests\FailedAcceptRequest;
 use App\Http\Resources\RequestAcceptedResource;
 use App\Jobs\NotifyClientWorkerAccepted;
@@ -17,6 +18,15 @@ class WorkerAcceptRequestService
     public function acceptRequest(Request $request, User $worker): JsonResource
     {
         $acceptedRequest = DB::transaction(function () use ($request, $worker) {
+            User::query()
+                ->whereKey($worker->id)
+                ->lockForUpdate()
+                ->first();
+
+            if ($worker->hasActiveWorkerService()) {
+                throw new ActiveServiceAlreadyExists();
+            }
+
             $lockRequest = Request::query()
                 ->whereKey($request->id)
                 ->lockForUpdate()
@@ -37,7 +47,7 @@ class WorkerAcceptRequestService
             $application->save();
 
             NotifyClientWorkerAccepted::dispatch($lockRequest);
-            return $request->load(['user']);
+            return $lockRequest->load(['user']);
         });
 
         return new RequestAcceptedResource($acceptedRequest);

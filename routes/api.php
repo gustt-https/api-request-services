@@ -19,6 +19,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])
         ->group(function () {
             Route::post('/devices', [DeviceController::class, 'register']);
+            Route::post('/devices/disabled', [DeviceController::class, 'disabled']);
             Route::get('/me', MeController::class);
         });
 

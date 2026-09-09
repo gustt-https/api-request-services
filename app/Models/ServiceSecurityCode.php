@@ -10,8 +10,16 @@ class ServiceSecurityCode extends Model
 
     protected $fillable = [
         'code',
-        'created_at'
+        'used_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'code' => 'encrypted',
+            'used_at' => 'datetime',
+        ];
+    }
 
     public function request()
     {

@@ -5,6 +5,7 @@ namespace App\Service\V1\worker;
 use App\Enums\RequestStatus;
 use App\Exceptions\Requests\ApplicationNotFound;
 use App\Http\Resources\RequestResource;
+use App\Jobs\NotifyClientServiceCompleted;
 use App\Models\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,10 @@ class WorkerFinishRequestService
 
             return $lockRequest->refresh();
         });
+
+        if ($finshedRequest) {
+            NotifyClientServiceCompleted::dispatch($finshedRequest);
+        }
 
         return new RequestResource($finshedRequest);
     }

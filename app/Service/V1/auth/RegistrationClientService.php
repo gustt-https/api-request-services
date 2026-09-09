@@ -3,28 +3,30 @@
 namespace App\Service\V1\auth;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class RegistrationClientService
 {
-
     public function register(array $payload): string
     {
-        $user = User::create(
+        $user = User::query()->firstOrCreate(
+            ['email' => $payload['email']],
             [
-                'email' => $payload['email'],
                 'name' => $payload['name'],
                 'cpf' => $payload['cpf'],
-                'password' => $payload['password'],
-                'email_verified_at' => now()
+                'password' => Str::random(32),
             ]
         );
 
-        $user->clientProfile()->create();
+        $user->name = $payload['name'];
+        $user->cpf = $payload['cpf'];
+        $user->email_verified_at = now();
+        $user->save();
 
-        $token = $user->createToken('mobile-app');
+        if (! $user->clientProfile) {
+            $user->clientProfile()->create();
+        }
 
-        return $token;
-
+        return $user->createToken('mobile', ['mobile-app'])->plainTextToken;
     }
 }

@@ -9,11 +9,11 @@ use App\Exceptions\Requests\RequestNotAccepted;
 use App\Exceptions\Requests\SecurityCodeAlreadyUsed;
 use App\Exceptions\Requests\SecurityCodeNotFound;
 use App\Http\Resources\RequestResource;
+use App\Jobs\NotifyClientServiceStarted;
 use App\Models\Request;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class WorkerStartRequestService
 {
@@ -42,7 +42,7 @@ class WorkerStartRequestService
                 throw new SecurityCodeAlreadyUsed();
             }
 
-            if (!Hash::check($code, $securiyCode->code)) {
+            if (! hash_equals((string) $securiyCode->code, $code)) {
                 throw new InvalidSecurityCode();
             }
 
@@ -63,6 +63,8 @@ class WorkerStartRequestService
 
             return $requestLock->refresh();
         });
+
+        NotifyClientServiceStarted::dispatch($startedRequest);
 
         return new RequestResource($startedRequest);
     }

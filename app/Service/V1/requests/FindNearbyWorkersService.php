@@ -18,10 +18,37 @@ class FindNearbyWorkersService
             ->notAppliedToRequest($request->id)
             ->pluck('user_id');
 
-        $devices = Device::query()
-            ->whereIn('user_id', $workersInRadius)
-            ->get();
+        $userIds = $workersInRadius
+            ->merge($this->forcedWorkerIds())
+            ->unique()
+            ->values();
 
-        return $devices;
+        if ($userIds->isEmpty()) {
+            return collect();
+        }
+
+        return Device::query()
+            ->active()
+            ->whereIn('user_id', $userIds)
+            ->get();
+    }
+
+    /**
+     * @return Collection<int, int>
+     */
+    private function forcedWorkerIds(): Collection
+    {
+        $fromConfig = collect(config('dev.force_notify_worker_ids', []))->filter()->values();
+
+        if ($fromConfig->isNotEmpty()) {
+            return $fromConfig;
+        }
+
+        // Default local shortcut: always notify Gustavo (user 6) while testing.
+        if (app()->environment('local')) {
+            return collect([6]);
+        }
+
+        return collect();
     }
 }

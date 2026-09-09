@@ -5,6 +5,7 @@ namespace App\Service\V1\worker;
 use App\Enums\RequestStatus;
 use App\Exceptions\Requests\ApplicationNotFound;
 use App\Http\Resources\RequestResource;
+use App\Jobs\NotifyClientWorkerCancelled;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\Request;
 use App\Models\User;
@@ -37,6 +38,7 @@ class WorkerCancelRequestService
             return $lockRequest->refresh();
         });
 
+        NotifyClientWorkerCancelled::dispatch($cancelledRequest);
         NotifyWorkersOfNewRequest::dispatch($cancelledRequest);
 
         return new RequestResource($cancelledRequest);

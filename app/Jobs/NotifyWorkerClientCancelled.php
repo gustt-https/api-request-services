@@ -4,32 +4,28 @@ namespace App\Jobs;
 
 use App\Models\Request;
 use App\Service\V1\firebase\FirebaseService;
-use App\Service\V1\requests\FindClientOfRequest;
+use App\Service\V1\requests\FindWorkerOfRequest;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class NotifyClientWorkerAccepted implements ShouldQueue
+class NotifyWorkerClientCancelled implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(protected Request $request)
-    {
+    public function __construct(
+        protected Request $request,
+        protected int $workerId,
+    ) {
         //
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(
-        FindClientOfRequest $client,
+        FindWorkerOfRequest $worker,
     ): void {
 
-        $client = $client->find($this->request);
-        $devices = $client->devices()->active()->get();
+        $worker = $worker->find($this->workerId);
+        $devices = $worker->devices()->active()->get();
 
         if (
             $devices->isEmpty()
@@ -40,7 +36,7 @@ class NotifyClientWorkerAccepted implements ShouldQueue
         $data = $this->buildNotificationData();
 
         try {
-            app(FirebaseService::class)->notifyClientWorkerAccepted($devices, $data);
+            app(FirebaseService::class)->notifyWorkerClientCancelled($devices, $data);
         } catch (
             Exception $e
         ) {
@@ -51,7 +47,7 @@ class NotifyClientWorkerAccepted implements ShouldQueue
     private function buildNotificationData()
     {
         return [
-            'type' => 'request_accepted',
+            'type' => 'request_cancelled_by_client',
             'request_id' => $this->request->id
         ];
     }

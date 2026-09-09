@@ -28,8 +28,8 @@ class RequestService
         $request = $user->requests()->create($payload);
         NotifyWorkersOfNewRequest::dispatch($request);
 
-        $code =  $this->generateCode->execute($request);
+        $this->generateCode->execute($request);
 
-        return (new RequestResource($request))->additional(['code' => $code]);
+        return new RequestResource($request->load(['securityCode']));
     }
 }

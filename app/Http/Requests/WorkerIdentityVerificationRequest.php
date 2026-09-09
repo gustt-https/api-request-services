@@ -25,9 +25,12 @@ class WorkerIdentityVerificationRequest extends FormRequest
         return [
             'document_type' => ['required', 'in:cnh,rg'],
             'document_number' => ['required', 'string'],
-            'document_front' => ['required', 'image', 'mimes:jpeg,jpg'],
-            'document_verse' => ['required', 'image', 'mimes:jpeg,jpg'],
-            'selfie' => ['required', 'image', 'mimes:jpeg,jpg'],
+            // Gallery picks are not re-encoded by the app, so the bytes may be
+            // whatever the phone saved. `mimes` matches sniffed content, not the
+            // filename the client sends.
+            'document_front' => ['required', 'image', 'mimes:jpeg,jpg,png,webp'],
+            'document_verse' => ['required', 'image', 'mimes:jpeg,jpg,png,webp'],
+            'selfie' => ['required', 'image', 'mimes:jpeg,jpg,png,webp'],
         ];
     }
 }

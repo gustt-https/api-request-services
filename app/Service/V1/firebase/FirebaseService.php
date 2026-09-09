@@ -57,4 +57,84 @@ class FirebaseService
 
         $this->messaging->sendMulticast($message, $tokens);
     }
+
+    public function notifyClientServiceStarted(Collection $devices, array $data)
+    {
+        $tokens = $devices
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return false;
+        }
+
+        $message = CloudMessage::new()->fromArray([
+            'notification' => [
+                'body' => 'O serviço foi iniciado.'
+            ],
+            'data' => $data
+        ]);
+
+        $this->messaging->sendMulticast($message, $tokens);
+    }
+
+    public function notifyClientServiceCompleted(Collection $devices, array $data)
+    {
+        $tokens = $devices
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return false;
+        }
+
+        $message = CloudMessage::new()->fromArray([
+            'notification' => [
+                'body' => 'O serviço foi encerrado.'
+            ],
+            'data' => $data
+        ]);
+
+        $this->messaging->sendMulticast($message, $tokens);
+    }
+
+    public function notifyClientWorkerCancelled(Collection $devices, array $data)
+    {
+        $tokens = $devices
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return false;
+        }
+
+        $message = CloudMessage::new()->fromArray([
+            'notification' => [
+                'body' => 'O profissional cancelou. Estamos buscando outro profissional.'
+            ],
+            'data' => $data
+        ]);
+
+        $this->messaging->sendMulticast($message, $tokens);
+    }
+
+    public function notifyWorkerClientCancelled(Collection $devices, array $data)
+    {
+        $tokens = $devices
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return false;
+        }
+
+        $message = CloudMessage::new()->fromArray([
+            'notification' => [
+                'body' => 'O cliente cancelou a solicitação.'
+            ],
+            'data' => $data
+        ]);
+
+        $this->messaging->sendMulticast($message, $tokens);
+    }
 }
