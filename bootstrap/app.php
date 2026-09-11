@@ -5,7 +5,6 @@ use App\Http\Middleware\EnsureIsClient;
 use App\Http\Middleware\EnsureIsWorker;
 use App\Http\Middleware\RegistrationTokenMiddleware;
 use App\Http\Middleware\RequestStartThrottle;
-use App\Http\Middleware\SendCodeThrottle;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -32,8 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'worker' => EnsureIsWorker::class,
             'client' => EnsureIsClient::class,
             'registration' => RegistrationTokenMiddleware::class,
-            'throttle.start' => RequestStartThrottle::class,
-            'throttle.send-code' => SendCodeThrottle::class
+            'throttle.start' => RequestStartThrottle::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

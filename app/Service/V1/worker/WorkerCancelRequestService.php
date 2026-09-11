@@ -11,13 +11,10 @@ use App\Jobs\NotifyClientWorkerCancelled;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\Request;
 use App\Models\User;
-use App\Service\V1\requests\ResolveSearchRadiusService;
 use Illuminate\Support\Facades\DB;
 
 class WorkerCancelRequestService
 {
-    public function __construct(protected ResolveSearchRadiusService $resolveRadius) {}
-
     public function cancelRequest(Request $request, User $worker)
     {
         $cancelledRequest = DB::transaction(function () use ($request, $worker) {
@@ -51,9 +48,6 @@ class WorkerCancelRequestService
         });
 
         NotifyClientWorkerCancelled::dispatch($cancelledRequest);
-
-        // Resetando o raio de busca antes de disparar...
-        $this->resolveRadius->forget($cancelledRequest);
         NotifyWorkersOfNewRequest::dispatch($cancelledRequest);
 
         return new RequestResource($cancelledRequest);
