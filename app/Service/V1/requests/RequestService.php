@@ -4,6 +4,7 @@ namespace App\Service\V1\requests;
 
 use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\RequestResource;
+use App\Jobs\NotifyClientRequestExpired;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\User;
 use App\Service\V1\firebase\FirebaseService;
@@ -27,9 +28,9 @@ class RequestService
         }
 
         $request = $user->requests()->create($payload);
+
         NotifyWorkersOfNewRequest::dispatch($request);
-
-
+        NotifyClientRequestExpired::dispatch($request)->delay(now()->addMinutes(10));
 
         $this->generateCode->execute($request);
 

@@ -137,4 +137,24 @@ class FirebaseService
 
         $this->messaging->sendMulticast($message, $tokens);
     }
+
+    public function notifyClientRequestExpired(Collection $devices, array $data)
+    {
+        $tokens = $devices
+            ->pluck('token')
+            ->toArray();
+
+        if (empty($tokens)) {
+            return false;
+        }
+
+        $message = CloudMessage::new()->fromArray([
+            'notification' => [
+                'body' => 'A solicitação expirou'
+            ],
+            'data' => $data
+        ]);
+
+        $this->messaging->sendMulticast($message, $tokens);
+    }
 }

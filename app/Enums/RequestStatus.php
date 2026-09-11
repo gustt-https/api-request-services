@@ -9,4 +9,5 @@ enum RequestStatus: string
     case IN_PROGRESS = 'in_progress';
     case CANCELED = 'canceled';
     case COMPLETED = 'completed';
+    case EXPIRED = 'expired';
 }
