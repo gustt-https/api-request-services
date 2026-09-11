@@ -14,7 +14,7 @@ class Me
 
     public function handle(User $user): MeResource
     {
-        $me = $user->load(['clientProfile', 'workerProfile.identityVerification']);
+        $me = $user->load(['clientProfile', 'workerProfile.identityVerification', 'workerProfile']);
 
         $stats = $me->workerProfile ? $this->stats->forWorker($me) : null;
 

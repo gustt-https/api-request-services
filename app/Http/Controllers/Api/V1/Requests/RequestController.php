@@ -36,7 +36,7 @@ class RequestController extends Controller
     ) {
         $this->authorize('view', $requestService);
 
-        $requestService->load(['worker', 'securityCode']);
+        $requestService->load(['worker.workerProfile', 'securityCode']);
 
         return response()->json([
             'data' => new RequestResource($requestService)

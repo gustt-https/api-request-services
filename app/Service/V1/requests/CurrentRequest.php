@@ -19,7 +19,7 @@ class CurrentRequest
                 RequestStatus::ACCEPTED,
                 RequestStatus::SEARCHING
             ])
-            ->with(['worker', 'securityCode'])
+            ->with(['worker.workerProfile', 'securityCode'])
             ->latest('id')
             ->first();
 
