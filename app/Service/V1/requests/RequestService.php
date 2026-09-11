@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class RequestService
 {
+    protected int $radius = 5;
 
     public function __construct(
         protected FirebaseService $firebase,
@@ -27,6 +28,8 @@ class RequestService
 
         $request = $user->requests()->create($payload);
         NotifyWorkersOfNewRequest::dispatch($request);
+
+
 
         $this->generateCode->execute($request);
 
