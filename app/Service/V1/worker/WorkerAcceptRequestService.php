@@ -46,7 +46,7 @@ class WorkerAcceptRequestService
             $application->accepted_at = now();
             $application->save();
 
-            return $lockRequest->load(['user']);
+            return $lockRequest->load(['user', 'worker', 'worker.workerProfile']);
         });
 
         NotifyClientWorkerAccepted::dispatch($acceptedRequest);

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class RequestAcceptedResource extends JsonResource
 {
@@ -17,7 +18,12 @@ class RequestAcceptedResource extends JsonResource
         return [
             'id' => $this->id,
             'status' => $this->status,
-            'worker_id' => $this->worker_id,
+            'worker' => [
+                'id' => $this->worker->id,
+                'name' => $this->worker->name,
+                'avatar_url' => $this->avatarUrl()
+
+            ],
             'client' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name
@@ -33,5 +39,16 @@ class RequestAcceptedResource extends JsonResource
             'value' => $this->price,
             'accepted_at' => $this->activeApplication()?->accepted_at,
         ];
+    }
+
+    private function avatarUrl()
+    {
+        $path = $this->worker?->workerProfile?->profile_photo;
+
+        if (!$path) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($path);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class RequestResource extends JsonResource
 {
@@ -22,14 +23,15 @@ class RequestResource extends JsonResource
             'description' => $this->description,
             'client' => $this->when(
                 $request->user()?->id === $this->worker_id,
-                fn () => [
+                fn() => [
                     'id' => $this->user->id,
                     'name' => $this->user->name,
                 ],
             ),
             'worker' => $this->when($this->worker_id !== null, fn() => [
                 'id' => $this->worker->id,
-                'name' => $this->worker->name
+                'name' => $this->worker->name,
+                'avatar_url' => $this->avatarUrl()
             ]),
             'location' => [
                 'latitude' => (string) $this->latitude,
@@ -43,5 +45,16 @@ class RequestResource extends JsonResource
             'timestamps' => $this->lifecycleTimestamps(),
             'security_code' => $this->when($code !== null, $code),
         ];
+    }
+
+    private function avatarUrl()
+    {
+        $path = $this->worker?->workerProfile?->profile_photo;
+
+        if (!$path) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($path);
     }
 }
