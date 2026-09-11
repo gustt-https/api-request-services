@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    Route::post('/auth/send-code', SendVerificationCodeController::class);
+    Route::post('/auth/send-code', SendVerificationCodeController::class)->middleware('throttle.send-code');
     Route::post('/auth/verify-code', VerificationCodeController::class);
 
     Route::middleware(['auth:sanctum'])

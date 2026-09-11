@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Enums\RequestStatus;
 use App\Models\Request;
 use App\Service\V1\firebase\FirebaseService;
 use App\Service\V1\requests\FindNearbyWorkersService;
+use App\Service\V1\requests\ResolveSearchRadiusService;
 use App\Service\V1\requests\SaveWorkersNotifiedService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -21,15 +23,17 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
     public function handle(
         FindNearbyWorkersService $workers,
         SaveWorkersNotifiedService $saveWorkersNotified,
+        ResolveSearchRadiusService $radiusResolve
     ): void {
-        $devices = $workers->find($this->request, 5);
+
+        $this->request->refresh();
+        if ($this->request->status !== RequestStatus::SEARCHING) return;
+
+        $radius = $radiusResolve->resolve($this->request);
+        $devices = $workers->find($this->request, $radius);
 
         if ($devices->isNotEmpty()) {
             $saveWorkersNotified->execute($this->request, $devices);
-        }
-
-        if ($devices->isEmpty()) {
-            return;
         }
 
         try {
@@ -39,6 +43,15 @@ class NotifyWorkersOfNewRequest implements ShouldQueue
             );
         } catch (Throwable $exception) {
             report($exception);
+        }
+
+        $this->request->refresh();
+
+        if (
+            $this->request->status === RequestStatus::SEARCHING
+            && $radius === $radiusResolve::DEFAULT_RADIUS
+        ) {
+            self::dispatch($this->request)->delay(now()->addMinutes(5));
         }
     }
 
