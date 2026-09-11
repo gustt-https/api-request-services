@@ -4,6 +4,7 @@ namespace App\Service\V1\worker;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\Requests\ActiveServiceAlreadyExists;
+use App\Exceptions\Requests\ExpiredRequest;
 use App\Exceptions\Requests\FailedAcceptRequest;
 use App\Http\Resources\RequestAcceptedResource;
 use App\Jobs\NotifyClientWorkerAccepted;
@@ -32,9 +33,9 @@ class WorkerAcceptRequestService
                 ->lockForUpdate()
                 ->first();
 
-            if ($lockRequest->status !== RequestStatus::SEARCHING) {
-                throw new FailedAcceptRequest();
-            }
+            if ($lockRequest->status === RequestStatus::EXPIRED) throw new ExpiredRequest();
+            if ($lockRequest->status !== RequestStatus::SEARCHING) throw new FailedAcceptRequest();
+
 
             $lockRequest->worker_id = $worker->id;
             $lockRequest->status = RequestStatus::ACCEPTED;
