@@ -48,6 +48,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/availability/enable', [WorkerAvailabilityController::class, 'enable']);
             Route::post('/availability/disabled', [WorkerAvailabilityController::class, 'disabled']);
             Route::get('/current-service', [WorkerController::class, 'current']);
+            Route::get('/pending-offer', [WorkerController::class, 'pendingOffer']);
             Route::post('/request/{requestService}/accept', [WorkerController::class, 'accept']);
             Route::post('/request/{requestService}/start', [WorkerController::class, 'start'])->middleware('throttle.start');
             Route::post('/request/{requestService}/finish', [WorkerController::class, 'finish']);
