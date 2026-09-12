@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkerProfilePhotoRequest;
 use App\Http\Requests\WorkerStartService;
 use App\Models\Request;
+use App\Http\Resources\RequestResourcePreview;
 use App\Service\V1\worker\GetCurrentWorkerService;
+use App\Service\V1\worker\GetPendingOfferForWorker;
 use App\Service\V1\worker\WorkerAcceptRequestService;
 use App\Service\V1\worker\WorkerCancelRequestService;
 use App\Service\V1\worker\WorkerCompletService;
@@ -106,6 +108,16 @@ class WorkerController extends Controller
 
         return response()->json([
             'data' => $CurrentWorkerService->execute($worker)
+        ]);
+    }
+
+    public function pendingOffer(GetPendingOfferForWorker $service)
+    {
+        $worker = Auth::user();
+        $request = $service->execute($worker);
+
+        return response()->json([
+            'data' => $request ? new RequestResourcePreview($request) : null,
         ]);
     }
 

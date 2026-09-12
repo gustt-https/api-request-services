@@ -2,33 +2,34 @@
 
 namespace App\Service\V1\firebase;
 
-use App\Models\Device;
-use App\Models\User;
-use Illuminate\Foundation\Cloud;
 use Illuminate\Support\Collection;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
-
 
 class FirebaseService
 {
     public function __construct(protected Messaging $messaging) {}
 
-    public function sendNewRequestPush(Collection $devices, array $data): bool
+    /** FCM data payloads must be string values only. */
+    private function stringData(array $data): array
     {
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
+        return array_map(static fn ($value) => $value === null ? '' : (string) $value, $data);
+    }
 
-        if (empty($tokens)) {
+    /**
+     * @param  array{title: string, body: string}  $notification
+     */
+    private function sendToDevices(Collection $devices, array $notification, array $data): bool
+    {
+        $tokens = $devices->pluck('token')->filter()->values()->all();
+
+        if ($tokens === []) {
             return false;
         }
 
         $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'Novo pedido disponível na sua região'
-            ],
-            'data' => $data
+            'notification' => $notification,
+            'data' => $this->stringData($data),
         ]);
 
         $this->messaging->sendMulticast($message, $tokens);
@@ -36,125 +37,59 @@ class FirebaseService
         return true;
     }
 
-    public function notifyClientWorkerAccepted(Collection $devices, array $data)
+    public function sendNewRequestPush(Collection $devices, array $data): bool
     {
-
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
-
-        if (empty($tokens)) {
-            return false;
-        }
-
-
-        $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'A sua solicitação foi aceita.'
-            ],
-            'data' => $data
-        ]);
-
-        $this->messaging->sendMulticast($message, $tokens);
+        return $this->sendToDevices($devices, [
+            'title' => 'Novo pedido perto de você',
+            'body' => 'Uma limpeza está disponível na sua região. Abra para aceitar.',
+        ], $data);
     }
 
-    public function notifyClientServiceStarted(Collection $devices, array $data)
+    public function notifyClientWorkerAccepted(Collection $devices, array $data): bool
     {
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
-
-        if (empty($tokens)) {
-            return false;
-        }
-
-        $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'O serviço foi iniciado.'
-            ],
-            'data' => $data
-        ]);
-
-        $this->messaging->sendMulticast($message, $tokens);
+        return $this->sendToDevices($devices, [
+            'title' => 'Profissional a caminho',
+            'body' => 'Seu pedido foi aceito. Mostre o código de início quando chegar.',
+        ], $data);
     }
 
-    public function notifyClientServiceCompleted(Collection $devices, array $data)
+    public function notifyClientServiceStarted(Collection $devices, array $data): bool
     {
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
-
-        if (empty($tokens)) {
-            return false;
-        }
-
-        $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'O serviço foi encerrado.'
-            ],
-            'data' => $data
-        ]);
-
-        $this->messaging->sendMulticast($message, $tokens);
+        return $this->sendToDevices($devices, [
+            'title' => 'Limpeza em andamento',
+            'body' => 'O profissional iniciou o serviço no seu endereço.',
+        ], $data);
     }
 
-    public function notifyClientWorkerCancelled(Collection $devices, array $data)
+    public function notifyClientServiceCompleted(Collection $devices, array $data): bool
     {
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
-
-        if (empty($tokens)) {
-            return false;
-        }
-
-        $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'O profissional cancelou. Estamos buscando outro profissional.'
-            ],
-            'data' => $data
-        ]);
-
-        $this->messaging->sendMulticast($message, $tokens);
+        return $this->sendToDevices($devices, [
+            'title' => 'Serviço concluído',
+            'body' => 'A limpeza foi finalizada. Obrigado — até a próxima.',
+        ], $data);
     }
 
-    public function notifyWorkerClientCancelled(Collection $devices, array $data)
+    public function notifyClientWorkerCancelled(Collection $devices, array $data): bool
     {
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
-
-        if (empty($tokens)) {
-            return false;
-        }
-
-        $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'O cliente cancelou a solicitação.'
-            ],
-            'data' => $data
-        ]);
-
-        $this->messaging->sendMulticast($message, $tokens);
+        return $this->sendToDevices($devices, [
+            'title' => 'Buscando outro profissional',
+            'body' => 'Quem tinha aceito cancelou. Continuamos procurando perto de você.',
+        ], $data);
     }
 
-    public function notifyClientRequestExpired(Collection $devices, array $data)
+    public function notifyWorkerClientCancelled(Collection $devices, array $data): bool
     {
-        $tokens = $devices
-            ->pluck('token')
-            ->toArray();
+        return $this->sendToDevices($devices, [
+            'title' => 'Pedido cancelado',
+            'body' => 'O cliente cancelou essa solicitação.',
+        ], $data);
+    }
 
-        if (empty($tokens)) {
-            return false;
-        }
-
-        $message = CloudMessage::new()->fromArray([
-            'notification' => [
-                'body' => 'A solicitação expirou'
-            ],
-            'data' => $data
-        ]);
-
-        $this->messaging->sendMulticast($message, $tokens);
+    public function notifyClientRequestExpired(Collection $devices, array $data): bool
+    {
+        return $this->sendToDevices($devices, [
+            'title' => 'Busca encerrada',
+            'body' => 'Ninguém aceitou em 10 minutos. Você pode pedir de novo quando quiser.',
+        ], $data);
     }
 }

@@ -25,7 +25,11 @@ class WorkerProfilePhotoService
             Storage::disk('public')->delete($profile->profile_photo);
         }
 
-        $path = Storage::disk('public')->put('profile_photos', $file);
+        $path = Storage::disk('public')->putFile('profile_photos', $file);
+
+        if (!$path) {
+            throw new \RuntimeException('Não foi possível salvar a foto de perfil.');
+        }
 
         $profile->profile_photo = $path;
         $profile->save();
