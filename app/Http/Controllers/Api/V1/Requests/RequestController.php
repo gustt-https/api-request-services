@@ -10,6 +10,7 @@ use App\Http\Resources\RequestResourcePreview;
 use App\Models\Request;
 use App\Service\V1\requests\CancelRequest;
 use App\Service\V1\requests\CurrentRequest;
+use App\Service\V1\requests\GetWorkerLocation;
 use App\Service\V1\requests\RequestService;
 use App\Service\V1\requests\ShowRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -93,6 +94,18 @@ class RequestController extends Controller
 
         $client = Auth::user();
         $data = $current->execute($client);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    public function workerLocation(
+        Request $requestService,
+        GetWorkerLocation $workerLocation
+    ) {
+        $this->authorize('workerLocation', $requestService);
+        $data = $workerLocation->execute($requestService);
 
         return response()->json([
             'data' => $data

@@ -36,6 +36,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/requests', [RequestController::class, 'index']);
             Route::post('/requests', [RequestController::class, 'store']);
             Route::get('/requests/current', [RequestController::class, 'current']);
+            Route::get('/requests/{requestService}/worker-location', [RequestController::class, 'workerLocation']);
             Route::get('/requests/{requestService}', [RequestController::class, 'show']);
             Route::post('/request/{requestService}/cancel', [RequestController::class, 'cancel']);
         });
@@ -57,5 +58,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/services', [WorkerController::class, 'index']);
             Route::post('/identity-verification', [IdentityController::class, 'submit']);
             Route::post('/profile-photo', [WorkerController::class, 'profilePhoto']);
+            Route::post('/location', [WorkerController::class, 'location']);
         });
 });

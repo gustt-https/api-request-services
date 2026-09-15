@@ -12,7 +12,7 @@ class WorkerCompletService
     {
         $application = $worker->application()
             ->whereNotNull('completed_at')
-            ->with('request')
+            ->with(['request.user'])
             ->paginate();
 
         return WorkerServicesCompletedResource::collection($application);

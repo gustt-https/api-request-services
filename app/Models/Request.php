@@ -113,4 +113,9 @@ class Request extends Model
 
         return (string) $securityCode->code;
     }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

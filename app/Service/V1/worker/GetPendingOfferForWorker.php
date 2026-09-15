@@ -7,11 +7,6 @@ use App\Models\Request;
 use App\Models\RequestNotification;
 use App\Models\User;
 
-/**
- * Latest searching offer this worker was notified about.
- * Used when the app resumes without the worker tapping the FCM tray item —
- * Android does not deliver notification+data payloads to JS until tap.
- */
 class GetPendingOfferForWorker
 {
     public function execute(User $worker): ?Request

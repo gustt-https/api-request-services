@@ -52,6 +52,11 @@ class RequestPolicy
             ], true);
     }
 
+    public function workerLocation(User $user, Request $request)
+    {
+            return $request->user_id === $user->id;
+    }
+
     public function preview(User $user, Request $request): bool
     {
         return $request->workersWasNotified($user)

@@ -14,10 +14,16 @@ class WorkerServicesCompletedResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $client = $this->request?->user;
+
         return [
             'id' => $this->request->id,
             'status' => $this->request->status,
             'description' => $this->request->description,
+            'client' => $client ? [
+                'id' => $client->id,
+                'name' => $client->name,
+            ] : null,
             'location' => [
                 'latitude' => (string) $this->request->latitude,
                 'longitude' => (string) $this->request->longitude,

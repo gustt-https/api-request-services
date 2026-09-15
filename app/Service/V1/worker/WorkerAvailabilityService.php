@@ -2,16 +2,21 @@
 
 namespace App\Service\V1\worker;
 
+use App\Enums\RequestStatus;
 use App\Exceptions\Identity\IdentityIsNotVerified;
 use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\WorkerAvailibilityResource;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Predis\Command\Redis\SSUBSCRIBE;
 
 class WorkerAvailabilityService
 {
+
+    public function __construct(protected GetCurrentWorkerService $currentService) {}
+
     public function enable(User $worker, string $latitude, string $longitude): void
-    {   
+    {
 
         if (! $worker->identityIsVerified()) {
             throw new IdentityIsNotVerified($worker->identityVerification?->status);
@@ -37,5 +42,20 @@ class WorkerAvailabilityService
     public function currentAvailability(User $worker): ?JsonResource
     {
         return new WorkerAvailibilityResource($worker->workerProfile);
+    }
+
+    public function updateLocation(User $worker, $latitude, string $longitude)
+    {
+        $currentService = $worker->requests()
+            ->where('status', RequestStatus::ACCEPTED)
+            ->first();
+
+        if (!$currentService) return null;
+
+        $profile = $worker->workerProfile;
+        $profile->latitude = $latitude;
+        $profile->longitude = $longitude;
+        $profile->last_location_at = now();
+        $profile->save();
     }
 }

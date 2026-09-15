@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Worker;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\WorkerLocationRequest;
 use App\Http\Requests\WorkerProfilePhotoRequest;
 use App\Http\Requests\WorkerStartService;
 use App\Models\Request;
@@ -10,6 +11,7 @@ use App\Http\Resources\RequestResourcePreview;
 use App\Service\V1\worker\GetCurrentWorkerService;
 use App\Service\V1\worker\GetPendingOfferForWorker;
 use App\Service\V1\worker\WorkerAcceptRequestService;
+use App\Service\V1\worker\WorkerAvailabilityService;
 use App\Service\V1\worker\WorkerCancelRequestService;
 use App\Service\V1\worker\WorkerCompletService;
 use App\Service\V1\worker\WorkerFinishRequestService;
@@ -131,6 +133,23 @@ class WorkerController extends Controller
         return response()->json([
             'success' => true,
             'url' => $url
+        ]);
+    }
+
+    public function location(
+        WorkerLocationRequest $request,
+        WorkerAvailabilityService $workerService
+    ) {
+        $worker = $request->user();
+
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+
+        $workerService->updateLocation($worker, $latitude, $longitude);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Localização atualizada'
         ]);
     }
 }

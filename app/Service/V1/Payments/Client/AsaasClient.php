@@ -23,4 +23,12 @@ class AsaasClient
             ->throw()
             ->json();
     }
+
+    public function get(string $uri)
+    {
+        return $this->http()
+            ->get($uri)
+            ->throw()
+            ->json();
+    }
 }

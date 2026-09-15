@@ -11,7 +11,7 @@ class CustomerService
 {
     public function __construct(private CustomerGatewayInterface $gateway) {}
 
-    public function create(User $user): ?string
+    public function getOrCreate(User $user): ?string
     {
         $profile = $user->clientProfile;
 

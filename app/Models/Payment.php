@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    //
+    protected $table = 'payment';
+    
+
+    public function request()
+    {
+        return $this->belongsTo(Request::class);
+    }
 }
