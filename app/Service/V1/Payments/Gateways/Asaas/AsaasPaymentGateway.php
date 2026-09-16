@@ -5,7 +5,6 @@ namespace App\Service\V1\Payments\Gateways\Asaas;
 use App\DTOs\Payments\CreatePaymentData;
 use App\DTOs\Payments\PaymentData;
 use App\Exceptions\Payments\PaymentCreationFailed;
-use App\Models\Request;
 use App\Service\V1\Payments\Client\AsaasClient;
 use App\Service\V1\Payments\Contracts\PaymentGatewayInterface;
 
@@ -15,7 +14,7 @@ class AsaasPaymentGateway implements PaymentGatewayInterface
 
     public function createPayment(CreatePaymentData $data): ?PaymentData
     {
-        $payment = $this->client->post('/v3/lean/payments', [
+        $payment = $this->client->post('/lean/payments', [
             'customer' => $data->customer,
             'billingType' => $data->billingType,
             'value' => $data->value,
@@ -26,9 +25,9 @@ class AsaasPaymentGateway implements PaymentGatewayInterface
 
         return new PaymentData(
             provider: 'Asaas',
-            providerPaymentId: $payment['id'],
-            amount: $payment['value'],
-            status: $payment['status'],
+            providerPaymentId: (string) $payment['id'],
+            amount: (int) round((float) $payment['value']),
+            status: (string) $payment['status'],
         );
     }
 
@@ -36,10 +35,11 @@ class AsaasPaymentGateway implements PaymentGatewayInterface
     {
         $qrCode = $this->client->get("payments/{$paymentId}/pixQrCode");
 
-        if (!$qrCode) {
+        if (!$qrCode || empty($qrCode['payload'])) {
             throw new PaymentCreationFailed();
         }
 
-        return $qrCode;
+        // TEMP: app only needs copia-e-cola for now.
+        return $qrCode['payload'];
     }
 }

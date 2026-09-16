@@ -114,6 +114,11 @@ class Request extends Model
         return (string) $securityCode->code;
     }
 
+    public function medias()
+    {
+        return $this->hasMany(RequestMedia::class);
+    }
+
     public function payment()
     {
         return $this->hasOne(Payment::class);

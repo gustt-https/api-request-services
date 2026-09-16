@@ -37,7 +37,7 @@ class RequestController extends Controller
     ) {
         $this->authorize('view', $requestService);
 
-        $requestService->load(['worker.workerProfile', 'securityCode']);
+        $requestService->load(['worker.workerProfile', 'securityCode', 'medias']);
 
         return response()->json([
             'data' => new RequestResource($requestService)
@@ -50,7 +50,7 @@ class RequestController extends Controller
         $this->authorize('preview', $requestService);
 
         return response()->json([
-            'data' => new RequestResourcePreview($requestService)
+            'data' => new RequestResourcePreview($requestService->load(['medias']))
         ]);
     }
 

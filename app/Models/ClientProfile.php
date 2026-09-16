@@ -10,6 +10,7 @@ class ClientProfile extends Model
     protected $table = 'client_profiles';
 
     protected $fillable = [
+        'customer_id',
         'default_state',
         'default_city',
         'default_neighborhood',
@@ -17,7 +18,7 @@ class ClientProfile extends Model
         'default_address_number',
         'default_address',
         'default_cep',
-        'phone_confirmed_at'
+        'phone_confirmed_at',
     ];
 
     public function user()

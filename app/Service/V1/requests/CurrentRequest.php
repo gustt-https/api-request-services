@@ -15,11 +15,12 @@ class CurrentRequest
         $currentRequest = Request::query()
             ->where('user_id', $user->id)
             ->whereIn('status', [
+                RequestStatus::AWAIT_PAYMENT,
                 RequestStatus::IN_PROGRESS,
                 RequestStatus::ACCEPTED,
-                RequestStatus::SEARCHING
+                RequestStatus::SEARCHING,
             ])
-            ->with(['worker.workerProfile', 'securityCode'])
+            ->with(['worker.workerProfile', 'securityCode', 'medias'])
             ->latest('id')
             ->first();
 

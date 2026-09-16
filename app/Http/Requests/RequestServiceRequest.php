@@ -30,6 +30,8 @@ class RequestServiceRequest extends FormRequest
             'address' => ['required', 'string'],
             'address_number' => ['required', 'string'],
             'complement' => ['required', 'string'],
+            'photos' => ['required', 'array', 'min:1', 'max:3'],
+            'photos.*' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
             'price' => ['required', 'string']
         ];
     }

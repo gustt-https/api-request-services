@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\V1\Auth\VerificationCodeController;
 use App\Http\Controllers\Api\V1\DeviceController;
 use App\Http\Controllers\Api\V1\Identity\IdentityController;
 use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\Requests\RequestController;
+use App\Http\Controllers\Api\V1\Requests\RequestMediaController;
 use App\Http\Controllers\Api\V1\Worker\WorkerAvailabilityController;
 use App\Http\Controllers\Api\V1\Worker\WorkerController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +17,11 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/auth/send-code', SendVerificationCodeController::class)->middleware('throttle.send-code');
     Route::post('/auth/verify-code', VerificationCodeController::class);
+
+    /** Private request photos — query string signature, no Sanctum header (RN Image). */
+    Route::get('/request-media/{media}', [RequestMediaController::class, 'show'])
+        ->middleware('signed')
+        ->name('request-media.show');
 
     Route::middleware(['auth:sanctum'])
         ->group(function () {
@@ -38,6 +45,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/requests/current', [RequestController::class, 'current']);
             Route::get('/requests/{requestService}/worker-location', [RequestController::class, 'workerLocation']);
             Route::get('/requests/{requestService}', [RequestController::class, 'show']);
+            Route::get('/requests/{requestService}/payment', [PaymentController::class, 'show']);
             Route::post('/request/{requestService}/cancel', [RequestController::class, 'cancel']);
         });
 

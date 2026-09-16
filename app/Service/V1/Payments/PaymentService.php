@@ -32,8 +32,9 @@ class PaymentService
         $paymentData = new CreatePaymentData(
             customer: $customerId,
             billingType: 'PIX',
-            value: 100,
-            dueDate: '2026-08-15'
+            // TEMP: use request price; fallback keeps local tests unblocked.
+            value: (string) ($request->price ?: 100),
+            dueDate: now()->toDateString(),
         );
 
         $providerPayment = $this->create($paymentData);
@@ -42,11 +43,24 @@ class PaymentService
             throw new PaymentCreationFailed();
         }
 
+        $pixPayload = $this->paymentGateway->getPixQrCode($providerPayment->providerPaymentId);
+
+        if (! is_string($pixPayload) || $pixPayload === '') {
+            throw new PaymentCreationFailed();
+        }
+
         return $request->payment()->create([
             'provider' => $providerPayment->provider,
             'provider_payment_id' => $providerPayment->providerPaymentId,
+            'external_reference' => 'request:'.$request->id,
             'amount' => $providerPayment->amount,
             'status' => $providerPayment->status,
+            'pix_payload' => $pixPayload,
         ]);
+    }
+
+    public function getPayment()
+    {
+        
     }
 }

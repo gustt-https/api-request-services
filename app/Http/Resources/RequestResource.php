@@ -41,6 +41,16 @@ class RequestResource extends JsonResource
                 'cep' => $this->cep,
                 'complement' => $this->complement,
             ],
+            'photos' => $this->whenLoaded(
+                'medias',
+                fn () => $this->medias
+                    ->map(fn ($media) => [
+                        'id' => $media->id,
+                        'url' => $media->temporaryUrl(),
+                    ])
+                    ->values()
+                    ->all(),
+            ),
             'price' => (string) $this->price,
             'timestamps' => $this->lifecycleTimestamps(),
             'security_code' => $this->when($code !== null, $code),

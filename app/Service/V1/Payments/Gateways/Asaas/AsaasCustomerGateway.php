@@ -13,7 +13,7 @@ class AsaasCustomerGateway implements CustomerGatewayInterface
 
     public function createCustomer(CreateCustomerData $data): ?CustomerData
     {
-        $payload = $this->client->post('v3/customers', [
+        $payload = $this->client->post('/customers', [
             'name' => $data->name,
             'cpfCnpj' => $data->cpfCnpj,
             'email' => $data->email

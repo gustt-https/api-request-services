@@ -18,7 +18,7 @@ class GetCurrentWorkerService
                 RequestStatus::ACCEPTED,
                 RequestStatus::IN_PROGRESS
             ])
-            ->with('user')
+            ->with(['user', 'medias'])
             ->latest('id')
             ->first();
 

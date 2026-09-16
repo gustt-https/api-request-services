@@ -36,6 +36,6 @@ class GetPendingOfferForWorker
             ->orderByDesc('notified_at')
             ->first();
 
-        return $notification?->request;
+        return $notification?->request?->load(['medias']);
     }
 }
