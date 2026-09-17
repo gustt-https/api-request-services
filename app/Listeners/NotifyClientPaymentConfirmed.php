@@ -2,12 +2,12 @@
 
 namespace App\Listeners;
 
-use App\Events\RequestCreated;
-use App\Jobs\NotifyClientRequestExpired;
+use App\Events\PaymentConfirmed;
+use App\Jobs\NotifyClientPaymentConfirmed as JobsNotifyClientPaymentConfirmed;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class ScheduleExpiration
+class NotifyClientPaymentConfirmed
 {
     /**
      * Create the event listener.
@@ -20,9 +20,8 @@ class ScheduleExpiration
     /**
      * Handle the event.
      */
-    public function handle(RequestCreated $event): void
+    public function handle(PaymentConfirmed $event): void
     {
-        NotifyClientRequestExpired::dispatch($event->request)->delay(now()->addMinutes(10));
-        
+        JobsNotifyClientPaymentConfirmed::dispatch($event->request);
     }
 }

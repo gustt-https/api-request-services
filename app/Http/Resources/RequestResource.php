@@ -52,6 +52,12 @@ class RequestResource extends JsonResource
                     ->all(),
             ),
             'price' => (string) $this->price,
+            'payment' => $this->when(
+                $this->relationLoaded('payment') && $request->user()?->id === $this->user_id,
+                fn () => $this->payment
+                    ? new PaymentResource($this->payment)
+                    : null,
+            ),
             'timestamps' => $this->lifecycleTimestamps(),
             'security_code' => $this->when($code !== null, $code),
         ];

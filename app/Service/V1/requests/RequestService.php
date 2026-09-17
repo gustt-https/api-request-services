@@ -38,7 +38,7 @@ class RequestService
         app(PaymentService::class)->createForRequest($request);
 
         // TEMP: do not notify workers while awaiting payment.
-        return new RequestResource($request->fresh()->load(['securityCode', 'medias']));
+        return new RequestResource($request->fresh()->load(['securityCode', 'medias', 'payment']));
     }
 
     /**

@@ -18,12 +18,10 @@ return new class extends Migration
                 ->constrained('requests')
                 ->nullOnDelete();
             $table->string('provider');
-            /** Asaas ids look like `pay_…` — must be string, not integer. */
             $table->string('provider_payment_id');
             $table->string('external_reference');
             $table->decimal('amount', 10, 2);
             $table->string('status');
-            /** PIX copia-e-cola from Asaas — QR image is built on the client. */
             $table->text('pix_payload')->nullable();
             $table->dateTime('paid_at')->nullable();
             $table->timestamps();

@@ -85,6 +85,14 @@ class FirebaseService
         ], $data);
     }
 
+    public function notifyClientPaymentConfirmed(Collection $devices, array $data): bool
+    {
+        return $this->sendToDevices($devices, [
+            'title' => 'Pagamento confirmado',
+            'body' => 'Pix recebido. Já estamos procurando um profissional.',
+        ], $data);
+    }
+
     public function notifyClientRequestExpired(Collection $devices, array $data): bool
     {
         return $this->sendToDevices($devices, [

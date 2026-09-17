@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AsaasWebhookController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\SendVerificationCodeController;
 use App\Http\Controllers\Api\V1\Auth\VerificationCodeController;
 use App\Http\Controllers\Api\V1\DeviceController;
 use App\Http\Controllers\Api\V1\Identity\IdentityController;
 use App\Http\Controllers\Api\V1\MeController;
-use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\Requests\RequestController;
 use App\Http\Controllers\Api\V1\Requests\RequestMediaController;
 use App\Http\Controllers\Api\V1\Worker\WorkerAvailabilityController;
@@ -45,7 +45,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/requests/current', [RequestController::class, 'current']);
             Route::get('/requests/{requestService}/worker-location', [RequestController::class, 'workerLocation']);
             Route::get('/requests/{requestService}', [RequestController::class, 'show']);
-            Route::get('/requests/{requestService}/payment', [PaymentController::class, 'show']);
             Route::post('/request/{requestService}/cancel', [RequestController::class, 'cancel']);
         });
 
@@ -68,4 +67,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/profile-photo', [WorkerController::class, 'profilePhoto']);
             Route::post('/location', [WorkerController::class, 'location']);
         });
+
+
+        Route::post('/webhook/asaas', [AsaasWebhookController::class, 'handle']);
 });
