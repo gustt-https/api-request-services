@@ -69,5 +69,7 @@ Route::prefix('v1')->group(function () {
         });
 
 
+    Route::middleware('asaas.webhook.signature')->group(function () {
         Route::post('/webhook/asaas', [AsaasWebhookController::class, 'handle']);
+    });
 });

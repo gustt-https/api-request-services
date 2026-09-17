@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class NotifyClientPaymentConfirmed implements ShouldQueue
+class NotifyClientPaymentConfirmedJob implements ShouldQueue
 {
     use Queueable;
 

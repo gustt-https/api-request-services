@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('worker_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('status')->default('searching');
+            $table->string('status')->default('await_payment');
             $table->longText('description');
             $table->decimal('latitude');
             $table->decimal('longitude');

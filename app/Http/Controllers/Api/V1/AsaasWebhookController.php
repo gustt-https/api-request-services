@@ -23,7 +23,8 @@ class AsaasWebhookController extends Controller
             $request->input('id'),
             $request->input('event'),
             $request->input('dateCreated'),
-            $paymentData
+            $paymentData,
+            $request->all()
         );
 
         $asaasService->handle($eventData);

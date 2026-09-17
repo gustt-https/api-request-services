@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\PaymentConfirmed;
-use App\Jobs\NotifyClientPaymentConfirmed as JobsNotifyClientPaymentConfirmed;
+use App\Jobs\NotifyClientPaymentConfirmedJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -22,6 +22,6 @@ class NotifyClientPaymentConfirmed
      */
     public function handle(PaymentConfirmed $event): void
     {
-        JobsNotifyClientPaymentConfirmed::dispatch($event->request);
+        NotifyClientPaymentConfirmedJob::dispatch($event->request);
     }
 }

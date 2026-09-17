@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('request_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('request_id')->constrained('requests');
-            // Ajustado: users.user_id não existe — a PK é id.
             $table->foreignId('worker_id')->constrained('users');
             $table->timestamp('accepted_at')->nullable();
             $table->timestamp('started_at')->nullable();

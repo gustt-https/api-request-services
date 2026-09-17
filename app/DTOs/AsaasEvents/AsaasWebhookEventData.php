@@ -8,6 +8,7 @@ class AsaasWebhookEventData
         public string $id,
         public string $event,
         public string $dateCreated,
-        public AsaasWebhookPaymentData $payment
+        public AsaasWebhookPaymentData $payment,
+        public array $payload
     ) {}
 }

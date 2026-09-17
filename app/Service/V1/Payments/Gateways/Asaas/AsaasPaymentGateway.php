@@ -26,7 +26,7 @@ class AsaasPaymentGateway implements PaymentGatewayInterface
         return new PaymentData(
             provider: 'Asaas',
             providerPaymentId: (string) $payment['id'],
-            amount: (int) round((float) $payment['value']),
+            amount: (float) number_format($payment['value'], 2, '.', ''),
             status: (string) $payment['status'],
         );
     }
@@ -38,8 +38,6 @@ class AsaasPaymentGateway implements PaymentGatewayInterface
         if (!$qrCode || empty($qrCode['payload'])) {
             throw new PaymentCreationFailed();
         }
-
-        // TEMP: app only needs copia-e-cola for now.
         return $qrCode['payload'];
     }
 }

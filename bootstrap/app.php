@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\DomainException;
+use App\Http\Middleware\AsaasWebhookSignature;
 use App\Http\Middleware\EnsureIsClient;
 use App\Http\Middleware\EnsureIsWorker;
 use App\Http\Middleware\RegistrationTokenMiddleware;
@@ -34,7 +35,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'client' => EnsureIsClient::class,
             'registration' => RegistrationTokenMiddleware::class,
             'throttle.start' => RequestStartThrottle::class,
-            'throttle.send-code' => SendCodeThrottle::class
+            'throttle.send-code' => SendCodeThrottle::class,
+            'asaas.webhook.signature' => AsaasWebhookSignature::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

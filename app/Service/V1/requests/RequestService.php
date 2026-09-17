@@ -15,9 +15,12 @@ use App\Service\V1\firebase\FirebaseService;
 use App\Service\V1\Payments\PaymentService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class RequestService
 {
+    public function __construct(public PaymentService $payment) {}
+
     public function makeRequest(User $user, array $payload): JsonResource
     {
         if (
@@ -29,16 +32,18 @@ class RequestService
         $medias = $payload['photos'] ?? [];
         unset($payload['photos']);
 
-        $request = $user->requests()->create($payload);
-        $this->addMedia($request, $medias);
-        $this->generateSecurityCode($request);
+        $request =  DB::transaction(function () use ($user, $payload, $medias) {
+            $request = $user->requests()->create($payload);
 
-        // TEMP: generate PIX on create so GET .../payment can be validated.
-        // Replace later with the real billing moment + error handling.
-        app(PaymentService::class)->createForRequest($request);
+            $this->addMedia($request, $medias);
+            $this->generateSecurityCode($request);
 
-        // TEMP: do not notify workers while awaiting payment.
-        return new RequestResource($request->fresh()->load(['securityCode', 'medias', 'payment']));
+            return $request->refresh();
+        });
+
+
+        $this->payment->createForRequest($request);
+        return new RequestResource($request->load(['securityCode', 'medias', 'payment']));
     }
 
     /**

@@ -6,6 +6,7 @@ use App\DTOs\AsaasEvents\AsaasWebhookEventData;
 use App\Models\Payment;
 use App\Models\PaymentEvent;
 use App\Service\V1\Webhook\Payments\ConfirmPaymentService;
+use Illuminate\Support\Facades\DB;
 
 class AsaasWebhookService
 {
@@ -13,26 +14,39 @@ class AsaasWebhookService
 
     public function handle(AsaasWebhookEventData $data)
     {
-        $alreadyProcessed = PaymentEvent::query()
-            ->where('provider_event_id', $data->id)
-            ->exists();
 
-        if ($alreadyProcessed) {
-            return;
-        }
 
-        $payment = Payment::query()
-            ->where('provider_payment_id', $data->payment->id)
-            ->first();
+        DB::transaction(function () use ($data) {
 
-        if (! $payment) {
-            return;
-        }
+            $payment = Payment::query()
+                ->where('provider_payment_id', $data->payment->id)
+                ->lockForUpdate()
+                ->first();
 
-        switch ($data->event) {
-            case 'PAYMENT_RECEIVED':
-                $this->paymentConfirm->confirm($payment);
-                break;
-        }
+            if (! $payment) {
+                abort(503);
+            }
+            $alreadyProcessed = PaymentEvent::query()
+                ->where('provider_event_id', $data->id)
+                ->first();
+
+            if ($alreadyProcessed) {
+                return;
+            }
+
+            $payment->events()->create([
+                'provider' =>  'asaas',
+                'provider_event_id' => $data->id,
+                'event' => $data->event,
+                'payload' => $data->payload
+            ]);
+
+            $event = $data->event;
+
+            match ($event) {
+                'PAYMENT_RECEIVED' => $this->paymentConfirm->confirm($payment),
+                default => null
+            };
+        });
     }
 }

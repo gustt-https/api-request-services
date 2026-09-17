@@ -5,8 +5,10 @@ namespace App\Service\V1\Payments;
 use App\DTOs\Payments\CreatePaymentData;
 use App\Exceptions\Payments\PaymentCreationFailed;
 use App\Exceptions\Payments\PaymentCustomerUnavailable;
+use App\Jobs\RetryFetchPaymentPix;
 use App\Models\Request;
 use App\Service\V1\Payments\Contracts\PaymentGatewayInterface;
+use Throwable;
 
 class PaymentService
 {
@@ -32,8 +34,7 @@ class PaymentService
         $paymentData = new CreatePaymentData(
             customer: $customerId,
             billingType: 'PIX',
-            // TEMP: use request price; fallback keeps local tests unblocked.
-            value: (string) ($request->price ?: 100),
+            value: number_format((float) $request->price, 2, '.', ''),
             dueDate: now()->toDateString(),
         );
 
@@ -43,24 +44,25 @@ class PaymentService
             throw new PaymentCreationFailed();
         }
 
-        $pixPayload = $this->paymentGateway->getPixQrCode($providerPayment->providerPaymentId);
-
-        if (! is_string($pixPayload) || $pixPayload === '') {
-            throw new PaymentCreationFailed();
-        }
-
-        return $request->payment()->create([
+        $payment = $request->payment()->create([
             'provider' => $providerPayment->provider,
             'provider_payment_id' => $providerPayment->providerPaymentId,
-            'external_reference' => 'request:'.$request->id,
+            'external_reference' => 'request:' . $request->id,
             'amount' => $providerPayment->amount,
             'status' => $providerPayment->status,
-            'pix_payload' => $pixPayload,
         ]);
-    }
 
-    public function getPayment()
-    {
-        
+        try {
+
+            $pixPayload = $this->paymentGateway->getPixQrCode($providerPayment->providerPaymentId);
+
+            $payment->update([
+                'pix_payload' => $pixPayload
+            ]);
+        } catch (Throwable $e) {
+            RetryFetchPaymentPix::dispatch($payment->id);
+        }
+
+        return $payment;
     }
 }

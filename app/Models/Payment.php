@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Override;
 
 class Payment extends Model
 {
@@ -27,5 +28,10 @@ class Payment extends Model
     public function request()
     {
         return $this->belongsTo(Request::class);
+    }
+
+    public function events()
+    {
+        return $this->hasMany(PaymentEvent::class);
     }
 }

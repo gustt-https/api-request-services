@@ -25,12 +25,13 @@ class ConfirmPaymentService
             }
 
             if ($lockedPayment->status !== 'PENDING') {
-                throw new PaymentCannotBeConfirmed();
+                return;
             }
 
             $lockedPayment->status = 'RECEIVED';
             $lockedPayment->paid_at = now();
             $lockedPayment->save();
+
 
             $request = $lockedPayment->request;
             $request->status = RequestStatus::SEARCHING;
@@ -39,8 +40,9 @@ class ConfirmPaymentService
             return $request->refresh();
         });
 
+        if (!$request) return;
+
         event(new PaymentConfirmed($request));
-        // Start worker search only after Pix clears.
         event(new RequestCreated($request));
     }
 }
