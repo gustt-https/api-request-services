@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\RequestCreated;
+use App\Events\PaymentConfirmed;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -20,7 +20,7 @@ class NotifyWorkers
     /**
      * Handle the event.
      */
-    public function handle(RequestCreated $event): void
+    public function handle(PaymentConfirmed $event): void
     {
         NotifyWorkersOfNewRequest::dispatch($event->request);
     }

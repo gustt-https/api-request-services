@@ -3,66 +3,47 @@
 namespace App\Service\V1\Payments;
 
 use App\DTOs\Payments\CreatePaymentData;
+use App\DTOs\Payments\PaymentData;
 use App\Exceptions\Payments\PaymentCreationFailed;
-use App\Exceptions\Payments\PaymentCustomerUnavailable;
 use App\Jobs\RetryFetchPaymentPix;
+use App\Models\Payment;
 use App\Models\Request;
+use App\Service\V1\Payments\Contracts\CustomerGatewayInterface;
 use App\Service\V1\Payments\Contracts\PaymentGatewayInterface;
 use Throwable;
 
 class PaymentService
 {
+
     public function __construct(
         private PaymentGatewayInterface $paymentGateway,
-        private CustomerService $customerService
     ) {}
 
-    public function create(CreatePaymentData $data)
+    public function process(Payment $payment, string $customerId)
     {
-        return $this->paymentGateway->createPayment($data);
-    }
-
-    public function createForRequest(Request $request)
-    {
-        $user = $request->user;
-        $customerId = $this->customerService->getOrCreate($user);
-
-        if (! $customerId) {
-            throw new PaymentCustomerUnavailable();
-        }
-
-        $paymentData = new CreatePaymentData(
+        $data = new CreatePaymentData(
             customer: $customerId,
             billingType: 'PIX',
-            value: number_format((float) $request->price, 2, '.', ''),
-            dueDate: now()->toDateString(),
+            value: $payment->amount,
+            dueDate: now()->toDateString()
         );
 
-        $providerPayment = $this->create($paymentData);
+        $providerPayment = $this->paymentGateway->createPayment($data);
 
-        if (! $providerPayment?->providerPaymentId) {
-            throw new PaymentCreationFailed();
-        }
+        if (! $providerPayment) throw new PaymentCreationFailed();
 
-        $payment = $request->payment()->create([
-            'provider' => $providerPayment->provider,
-            'provider_payment_id' => $providerPayment->providerPaymentId,
-            'external_reference' => 'request:' . $request->id,
-            'amount' => $providerPayment->amount,
-            'status' => $providerPayment->status,
-        ]);
+        $payment->provider_payment_id = $providerPayment->providerPaymentId;
+        $payment->amount = $providerPayment->amount;
+        $payment->status = $providerPayment->status;
+        $payment->save();
 
         try {
-
-            $pixPayload = $this->paymentGateway->getPixQrCode($providerPayment->providerPaymentId);
-
-            $payment->update([
-                'pix_payload' => $pixPayload
-            ]);
+            $payloadPix = $this->paymentGateway->getPixQrCode($providerPayment->providerPaymentId);
+            $payment->update(['pix_payload' => $payloadPix]);
+            return $payment->refresh();
+            
         } catch (Throwable $e) {
             RetryFetchPaymentPix::dispatch($payment->id);
         }
-
-        return $payment;
     }
 }

@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\DB;
 
 class RequestService
 {
-    public function __construct(public PaymentService $payment) {}
+
+    public function __construct(public PaymentService $paymentService)
+    {
+    }
 
     public function makeRequest(User $user, array $payload): JsonResource
     {
@@ -37,14 +40,20 @@ class RequestService
 
         $request = DB::transaction(function () use ($user, $payload, $medias) {
             $request = $user->requests()->create($payload);
+            $request->payment()->create([
+                'provider' => 'asaas',
+                'external_reference' => 'request:' . $request->id,
+                'amount' => $request->price,
+                'status' => 'pending',
+            ]);
 
             $this->addMedia($request, $medias);
             $this->generateSecurityCode($request);
-
             return $request->refresh();
         });
 
-        $this->payment->createForRequest($request);
+        $payment = $request->refresh()->payment;
+        $this->paymentService->process($payment);
 
         return new RequestResource($request->load(['securityCode', 'medias', 'payment', 'servicePackage']));
     }

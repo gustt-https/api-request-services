@@ -4,8 +4,6 @@ namespace App\Service\V1\Webhook\Payments;
 
 use App\Enums\RequestStatus;
 use App\Events\PaymentConfirmed;
-use App\Events\RequestCreated;
-use App\Exceptions\PaymentCannotBeConfirmed;
 use App\Exceptions\PaymentNotFound;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
@@ -43,6 +41,5 @@ class ConfirmPaymentService
         if (!$request) return;
 
         event(new PaymentConfirmed($request));
-        event(new RequestCreated($request));
     }
 }
