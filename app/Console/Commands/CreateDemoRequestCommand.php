@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\RequestStatus;
 use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\Request;
+use App\Models\ServicePackage;
 use App\Models\User;
 use App\Models\WorkerProfile;
 use App\Service\V1\requests\GenerateSecurityCodeService;
@@ -51,6 +52,9 @@ class CreateDemoRequestCommand extends Command
         $lat = (string) ($worker->latitude ?: '-10.89468790');
         $lng = (string) ($worker->longitude ?: '-37.09853720');
 
+        $package = ServicePackage::query()->active()->where('slug', 'economico')->first()
+            ?? ServicePackage::query()->active()->first();
+
         $request = $client->requests()->create([
             'description' => 'Limpeza demo — teste de push para o worker '.$workerId,
             'latitude' => $lat,
@@ -59,7 +63,9 @@ class CreateDemoRequestCommand extends Command
             'address' => 'Rua Demo Limpy',
             'address_number' => '100',
             'complement' => 'Apt 1',
-            'price' => 80.00,
+            'service_package_id' => $package?->id,
+            'package_name' => $package?->name,
+            'price' => $package?->price ?? 80.00,
         ]);
 
         $generateCode->execute($request);

@@ -2,16 +2,11 @@
 
 namespace App\Service\V1\requests;
 
-use App\DTOs\Payments\CreatePaymentData;
-use App\DTOs\Payments\PaymentData;
-use App\Events\RequestCreated;
 use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\RequestResource;
-use App\Jobs\NotifyClientRequestExpired;
-use App\Jobs\NotifyWorkersOfNewRequest;
 use App\Models\Request;
+use App\Models\ServicePackage;
 use App\Models\User;
-use App\Service\V1\firebase\FirebaseService;
 use App\Service\V1\Payments\PaymentService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\UploadedFile;
@@ -29,10 +24,18 @@ class RequestService
             throw new ActiveServiceAlreadyExists();
         }
 
-        $medias = $payload['photos'] ?? [];
-        unset($payload['photos']);
+        $package = ServicePackage::query()
+            ->active()
+            ->findOrFail($payload['service_package_id']);
 
-        $request =  DB::transaction(function () use ($user, $payload, $medias) {
+        $medias = $payload['photos'] ?? [];
+        unset($payload['photos'], $payload['price']);
+
+        $payload['service_package_id'] = $package->id;
+        $payload['package_name'] = $package->name;
+        $payload['price'] = $package->price;
+
+        $request = DB::transaction(function () use ($user, $payload, $medias) {
             $request = $user->requests()->create($payload);
 
             $this->addMedia($request, $medias);
@@ -41,9 +44,9 @@ class RequestService
             return $request->refresh();
         });
 
-
         $this->payment->createForRequest($request);
-        return new RequestResource($request->load(['securityCode', 'medias', 'payment']));
+
+        return new RequestResource($request->load(['securityCode', 'medias', 'payment', 'servicePackage']));
     }
 
     /**

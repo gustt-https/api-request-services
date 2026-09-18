@@ -24,6 +24,7 @@ class CancelRequest
             if (! in_array($lockedRequest->status, [
                 RequestStatus::SEARCHING,
                 RequestStatus::ACCEPTED,
+                RequestStatus::AWAIT_PAYMENT
             ], true)) {
                 throw new FailedCancelRequest(
                     'Não é possível cancelar um serviço em andamento ou já finalizado.'

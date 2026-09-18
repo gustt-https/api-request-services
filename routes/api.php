@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Identity\IdentityController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\Requests\RequestController;
 use App\Http\Controllers\Api\V1\Requests\RequestMediaController;
+use App\Http\Controllers\Api\V1\ServicePackages\ServicePackageController;
 use App\Http\Controllers\Api\V1\Worker\WorkerAvailabilityController;
 use App\Http\Controllers\Api\V1\Worker\WorkerController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('client')
         ->middleware(['auth:sanctum', 'client'])
         ->group(function () {
+            Route::get('/service-packages', [ServicePackageController::class, 'index']);
             Route::get('/requests', [RequestController::class, 'index']);
             Route::post('/requests', [RequestController::class, 'store']);
             Route::get('/requests/current', [RequestController::class, 'current']);
@@ -69,7 +71,5 @@ Route::prefix('v1')->group(function () {
         });
 
 
-    Route::middleware('asaas.webhook.signature')->group(function () {
         Route::post('/webhook/asaas', [AsaasWebhookController::class, 'handle']);
-    });
 });

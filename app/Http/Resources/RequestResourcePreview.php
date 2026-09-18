@@ -41,6 +41,13 @@ class RequestResourcePreview extends JsonResource
                     ->all(),
             ),
             'price' => (string) $this->price,
+            'package' => $this->when(
+                $this->service_package_id !== null || $this->package_name !== null,
+                fn () => [
+                    'id' => $this->service_package_id,
+                    'name' => $this->package_name,
+                ],
+            ),
             'timestamps' => $this->lifecycleTimestamps(),
         ];
     }

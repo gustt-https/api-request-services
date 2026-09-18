@@ -22,6 +22,8 @@ class Request extends Model
         'address_number',
         'complement',
         'price',
+        'service_package_id',
+        'package_name',
     ];
 
     public function user()
@@ -48,6 +50,11 @@ class Request extends Model
     public function worker()
     {
         return $this->belongsTo(User::class, 'worker_id');
+    }
+
+    public function servicePackage()
+    {
+        return $this->belongsTo(ServicePackage::class);
     }
 
     public function activeApplication(): ?RequestApplication

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RequestServiceRequest extends FormRequest
 {
@@ -23,6 +24,11 @@ class RequestServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'service_package_id' => [
+                'required',
+                'integer',
+                Rule::exists('service_packages', 'id')->where('is_active', true),
+            ],
             'description' => ['required', 'string'],
             'latitude' => ['required', 'string'],
             'longitude' => ['required', 'string'],
@@ -32,7 +38,6 @@ class RequestServiceRequest extends FormRequest
             'complement' => ['required', 'string'],
             'photos' => ['required', 'array', 'min:1', 'max:3'],
             'photos.*' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
-            'price' => ['required', 'numeric', 'gt:0']
         ];
     }
 }

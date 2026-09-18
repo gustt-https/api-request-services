@@ -11,7 +11,7 @@ class ShowRequests
     public function execute(User $client): JsonResource
     {
         $requests = $client->requests()
-            ->with(['worker.workerProfile', 'securityCode'])
+            ->with(['worker.workerProfile', 'securityCode', 'servicePackage'])
             ->latest('id')
             ->get();
         

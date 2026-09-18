@@ -48,7 +48,8 @@ class RequestPolicy
         return $request->user_id === $user->id
             && in_array($request->status, [
                 RequestStatus::ACCEPTED,
-                RequestStatus::SEARCHING
+                RequestStatus::SEARCHING,
+                RequestStatus::AWAIT_PAYMENT
             ], true);
     }
 
