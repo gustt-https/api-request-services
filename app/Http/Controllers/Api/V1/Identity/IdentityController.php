@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Identity;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkerIdentityVerificationRequest;
-use App\Service\V1\identity\SubmitIdentityVerificationService;
+use App\Service\V1\Identity\SubmitIdentityVerificationService;
 
 class IdentityController extends Controller
 {

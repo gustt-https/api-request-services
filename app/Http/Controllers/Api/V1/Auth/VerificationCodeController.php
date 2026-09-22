@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VerifyCodeRequest;
-use App\Service\V1\auth\VerificationCodeService;
+use App\Service\V1\Auth\VerificationCodeService;
 
 class VerificationCodeController extends Controller
 {

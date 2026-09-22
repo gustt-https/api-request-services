@@ -8,11 +8,11 @@ use App\Http\Requests\RequestServiceRequest;
 use App\Http\Resources\RequestResource;
 use App\Http\Resources\RequestResourcePreview;
 use App\Models\Request;
-use App\Service\V1\requests\CancelRequest;
-use App\Service\V1\requests\CurrentRequest;
-use App\Service\V1\requests\GetWorkerLocation;
-use App\Service\V1\requests\RequestService;
-use App\Service\V1\requests\ShowRequests;
+use App\Service\V1\Requests\CancelRequest;
+use App\Service\V1\Requests\CurrentRequest;
+use App\Service\V1\Requests\GetWorkerLocation;
+use App\Service\V1\Requests\RequestService;
+use App\Service\V1\Requests\ShowRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 

@@ -22,11 +22,11 @@ class AsaasCustomerGateway implements CustomerGatewayInterface
         if (!isset($payload['id'])) return null;
 
         return new CustomerData(
-                $payload['id'],
-                $payload['name'],
-                $payload['cpfCnpj'],
-                $payload['email']
-            );
+            $payload['id'],
+            $payload['name'],
+            $payload['cpfCnpj'],
+            $payload['email']
+        );
     }
 
     public function getCustomer() {}

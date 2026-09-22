@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkerAvailabilityRequest;
-use App\Service\V1\worker\WorkerAvailabilityService;
+use App\Service\V1\Worker\WorkerAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

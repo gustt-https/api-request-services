@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Actions\DisableDeviceAction;
-use App\Actions\RegisterDeviceAction;
+use App\Actions\Devices\DisableDeviceAction;
+use App\Actions\Devices\RegisterDeviceAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DisableDeviceRequest;
 use App\Http\Requests\RegisterDeviceRequest;

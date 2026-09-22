@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SendCodeRequest;
-use App\Service\V1\auth\SendEmailCodeService;
+use App\Service\V1\Auth\SendEmailCodeService;
 
 class SendVerificationCodeController extends Controller
 {

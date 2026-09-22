@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Exceptions\Auth\RegistrationTokenInvalidException;
-use App\Service\V1\auth\VerificationCodeService;
+use App\Service\V1\Auth\VerificationCodeService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;

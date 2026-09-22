@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Http\Resources\MeResource;
 use App\Models\User;
-use App\Service\V1\worker\WorkerStatsService;
+use App\Service\V1\Worker\WorkerStatsService;
 
 class Me
 {

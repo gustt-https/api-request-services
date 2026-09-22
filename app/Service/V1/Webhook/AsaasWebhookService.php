@@ -3,6 +3,7 @@
 namespace App\Service\V1\Webhook;
 
 use App\DTOs\AsaasEvents\AsaasWebhookEventData;
+use App\Enums\PaymentStatus;
 use App\Models\Payment;
 use App\Models\PaymentEvent;
 use App\Service\V1\Webhook\Payments\ConfirmPaymentService;
@@ -14,8 +15,6 @@ class AsaasWebhookService
 
     public function handle(AsaasWebhookEventData $data)
     {
-
-
         DB::transaction(function () use ($data) {
 
             $payment = Payment::query()

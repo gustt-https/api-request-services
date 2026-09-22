@@ -14,7 +14,7 @@ class PaymentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'status' => $this->status,
+            'status' => $this->status?->value ?? $this->status,
             'amount' => (string) $this->amount,
             'pix_payload' => $this->pix_payload,
             'paid_at' => $this->paid_at?->toIso8601String(),

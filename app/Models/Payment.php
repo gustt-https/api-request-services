@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Model;
-use Override;
 
 class Payment extends Model
 {
@@ -23,6 +23,7 @@ class Payment extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'status' => PaymentStatus::class,
     ];
 
     public function request()

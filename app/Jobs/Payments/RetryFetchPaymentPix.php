@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Jobs\Payments;
+
+use App\Enums\PaymentStatus;
+use App\Enums\RequestStatus;
+use App\Models\Payment;
+use App\Service\V1\Payments\Contracts\PaymentGatewayInterface;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+
+class RetryFetchPaymentPix implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(public string $paymentId)
+    {
+        //
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(PaymentGatewayInterface $gateway): void
+    {
+        $payment = Payment::query()
+            ->whereKey($this->paymentId)
+            ->first();
+
+        if (!$payment) return;
+
+        if ($payment->status !== PaymentStatus::PENDING) return;
+
+        if ($payment->request?->status !== RequestStatus::AWAIT_PAYMENT) return;
+
+        if ($payment->pix_payload) return;
+
+        $pixPayload =  $gateway->getPixQrCode($payment->provider_payment_id);
+
+        $payment->pix_payload = $pixPayload;
+        $payment->save();
+
+        if ($payment->request) {
+            NotifyClientPixReady::dispatch($payment->request);
+        }
+    }
+}

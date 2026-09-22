@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
-use App\Service\V1\auth\RegistrationClientService;
-use App\Service\V1\auth\RegistrationWorkerService;
+use App\Service\V1\Auth\RegistrationClientService;
+use App\Service\V1\Auth\RegistrationWorkerService;
 
 class AuthController extends Controller
 {

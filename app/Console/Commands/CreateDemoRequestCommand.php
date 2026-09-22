@@ -3,12 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Enums\RequestStatus;
-use App\Jobs\NotifyWorkersOfNewRequest;
+use App\Jobs\Requests\NotifyWorkersOfNewRequest;
 use App\Models\Request;
 use App\Models\ServicePackage;
 use App\Models\User;
 use App\Models\WorkerProfile;
-use App\Service\V1\requests\GenerateSecurityCodeService;
+use App\Service\V1\Requests\GenerateSecurityCodeService;
 use Illuminate\Console\Command;
 
 class CreateDemoRequestCommand extends Command

@@ -24,10 +24,19 @@ class AsaasClient
             ->json();
     }
 
-    public function get(string $uri)
+    public function get(string $uri, array $query = [])
     {
         return $this->http()
-            ->get($uri)
+            ->get($uri, $query)
+            ->throw()
+            ->json();
+    }
+
+    public function delete(string $uri, array $data = [])
+    {
+        return $this
+            ->http()
+            ->delete($uri, $data)
             ->throw()
             ->json();
     }
