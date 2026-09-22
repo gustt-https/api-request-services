@@ -36,5 +36,9 @@ class RetryFetchPaymentPix implements ShouldQueue
 
         $payment->pix_payload = $pixPayload;
         $payment->save();
+
+        if ($payment->request) {
+            NotifyClientPixReady::dispatch($payment->request);
+        }
     }
 }

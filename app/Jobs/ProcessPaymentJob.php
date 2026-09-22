@@ -27,12 +27,30 @@ class ProcessPaymentJob implements ShouldQueue
     public function handle(CustomerService $customerService, PaymentService $paymentService): void
     {   
         $request = $this->request->refresh();
-        
-        $customer = $customerService->getOrCreate($this->request->user);
-
-        if(! $customer) throw new PaymentCreationFailed();
-
         $payment = $request->payment;
-        $paymentService->process($request->payment, $customer);
+
+        if (! $payment) {
+            throw new PaymentCreationFailed();
+        }
+
+        if ($payment->provider_payment_id) {
+            if (! $payment->pix_payload) {
+                RetryFetchPaymentPix::dispatch($payment->id);
+            }
+
+            return;
+        }
+
+        $customer = $customerService->getOrCreate($request->user);
+
+        if (! $customer) {
+            throw new PaymentCreationFailed();
+        }
+
+        $processed = $paymentService->process($payment, $customer);
+
+        if ($processed?->pix_payload) {
+            NotifyClientPixReady::dispatch($request);
+        }
     }
 }

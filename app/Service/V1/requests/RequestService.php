@@ -4,20 +4,16 @@ namespace App\Service\V1\requests;
 
 use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\RequestResource;
+use App\Jobs\ProcessPaymentJob;
 use App\Models\Request;
 use App\Models\ServicePackage;
 use App\Models\User;
-use App\Service\V1\Payments\PaymentService;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 class RequestService
 {
-
-    public function __construct(public PaymentService $paymentService)
-    {
-    }
 
     public function makeRequest(User $user, array $payload): JsonResource
     {
@@ -52,8 +48,9 @@ class RequestService
             return $request->refresh();
         });
 
-        $payment = $request->refresh()->payment;
-        $this->paymentService->process($payment);
+        $request->refresh();
+
+        ProcessPaymentJob::dispatch($request);
 
         return new RequestResource($request->load(['securityCode', 'medias', 'payment', 'servicePackage']));
     }

@@ -85,6 +85,14 @@ class FirebaseService
         ], $data);
     }
 
+    public function notifyClientPixReady(Collection $devices, array $data): bool
+    {
+        return $this->sendToDevices($devices, [
+            'title' => 'Pix pronto para pagamento',
+            'body' => 'Seu código Pix já está disponível.',
+        ], $data);
+    }
+
     public function notifyClientPaymentConfirmed(Collection $devices, array $data): bool
     {
         return $this->sendToDevices($devices, [

@@ -40,6 +40,10 @@ class ConfirmPaymentService
 
         if (!$request) return;
 
-        event(new PaymentConfirmed($request));
+        // afterCommit: o webhook envolve este confirm() numa transaction externa.
+        // Sem isso o worker pode rodar o push antes do status SEARCHING existir.
+        DB::afterCommit(function () use ($request) {
+            event(new PaymentConfirmed($request));
+        });
     }
 }
