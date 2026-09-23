@@ -17,9 +17,9 @@ class FirebaseService
     }
 
     /**
-     * @param  array{title: string, body: string}  $notification
+     * @param  array{title: string, body: string}|null  $notification
      */
-    private function sendToDevices(Collection $devices, array $notification, array $data): bool
+    private function sendToDevices(Collection $devices, ?array $notification, array $data): bool
     {
         $tokens = $devices->pluck('token')->filter()->values()->all();
 
@@ -27,10 +27,34 @@ class FirebaseService
             return false;
         }
 
-        $message = CloudMessage::new()->fromArray([
-            'notification' => $notification,
+        $payload = [
             'data' => $this->stringData($data),
-        ]);
+            'android' => [
+                'priority' => 'high',
+            ],
+        ];
+
+        if ($notification !== null) {
+            $payload['notification'] = $notification;
+            $payload['android']['notification'] = [
+                'channel_id' => 'default',
+                'sound' => 'default',
+            ];
+        } else {
+            // Data-only: sem banner. O app usa type + request_id e faz o GET.
+            $payload['apns'] = [
+                'headers' => [
+                    'apns-priority' => '5',
+                ],
+                'payload' => [
+                    'aps' => [
+                        'content-available' => 1,
+                    ],
+                ],
+            ];
+        }
+
+        $message = CloudMessage::new()->fromArray($payload);
 
         $this->messaging->sendMulticast($message, $tokens);
 
@@ -87,10 +111,7 @@ class FirebaseService
 
     public function notifyClientPixReady(Collection $devices, array $data): bool
     {
-        return $this->sendToDevices($devices, [
-            'title' => 'Pix pronto para pagamento',
-            'body' => 'Seu código Pix já está disponível.',
-        ], $data);
+        return $this->sendToDevices($devices, null, $data);
     }
 
     public function notifyClientPaymentConfirmed(Collection $devices, array $data): bool

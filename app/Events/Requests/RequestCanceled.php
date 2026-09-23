@@ -18,8 +18,10 @@ class RequestCanceled
     /**
      * Create a new event instance.
      */
-    public function __construct(public Request $request)
-    {
+    public function __construct(
+        public Request $request,
+        public ?int $assignedWorkerId = null,
+    ) {
         //
     }
 

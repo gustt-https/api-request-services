@@ -58,11 +58,21 @@ class RequestPolicy
             return $request->user_id === $user->id;
     }
 
-    public function preview(User $user, Request $request): bool
+    public function preview(User $user, Request $request): Response
     {
-        return $request->workersWasNotified($user)
-            && $user->application()->where('request_id', $request->id)->doesntExist()
-            && $request->status === RequestStatus::SEARCHING;
+        if ($request->status !== RequestStatus::SEARCHING) {
+            return Response::deny('Esse pedido não está mais disponível.');
+        }
+
+        if (! $request->workersWasNotified($user)) {
+            return Response::deny('Você não foi notificado sobre este pedido.');
+        }
+
+        if ($user->application()->where('request_id', $request->id)->exists()) {
+            return Response::deny('Você já respondeu este pedido.');
+        }
+
+        return Response::allow();
     }
 
     public function start(User $user, Request $request)

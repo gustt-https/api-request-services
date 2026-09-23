@@ -75,9 +75,15 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
+            $previous = $e->getPrevious();
+            $message = $previous?->getMessage() ?: $e->getMessage();
+            if ($message === '' || $message === 'Access Denied.' || $message === 'This action is unauthorized.') {
+                $message = 'Você não tem permissão para realizar esta ação.';
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Você não tem permissão para realizar esta ação.',
+                'message' => $message,
             ], 403);
         });
 

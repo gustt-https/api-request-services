@@ -6,7 +6,6 @@ use App\Enums\RequestStatus;
 use App\Events\Requests\RequestCanceled;
 use App\Exceptions\Requests\FailedCancelRequest;
 use App\Http\Resources\RequestResource;
-use App\Jobs\Requests\NotifyWorkerClientCancelled;
 use App\Models\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -47,7 +46,7 @@ class CancelRequest
             return $lockedRequest->refresh();
         });
 
-        event(new RequestCanceled($cancelledRequest));
+        event(new RequestCanceled($cancelledRequest, $assignedWorkerId));
 
         return new RequestResource($cancelledRequest);
     }
