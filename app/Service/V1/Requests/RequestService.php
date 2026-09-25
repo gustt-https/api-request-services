@@ -31,6 +31,10 @@ class RequestService
         $medias = $payload['photos'] ?? [];
         unset($payload['photos'], $payload['price']);
 
+        // Optional in the app; columns are NOT NULL, so blanks are stored as ''.
+        $payload['description'] = $payload['description'] ?? '';
+        $payload['complement'] = $payload['complement'] ?? '';
+
         $payload['service_package_id'] = $package->id;
         $payload['package_name'] = $package->name;
         $payload['price'] = $package->price;

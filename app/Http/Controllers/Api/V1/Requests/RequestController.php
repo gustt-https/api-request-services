@@ -50,7 +50,7 @@ class RequestController extends Controller
         $this->authorize('preview', $requestService);
 
         return response()->json([
-            'data' => new RequestResourcePreview($requestService->load(['medias']))
+            'data' => new RequestResourcePreview($requestService->load(['medias', 'servicePackage']))
         ]);
     }
 

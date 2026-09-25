@@ -4,11 +4,10 @@ namespace App\Service\V1\Worker;
 
 use App\Enums\RequestStatus;
 use App\Exceptions\Identity\IdentityIsNotVerified;
-use App\Exceptions\Requests\ActiveServiceAlreadyExists;
 use App\Http\Resources\WorkerAvailibilityResource;
+use App\Models\Request;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Predis\Command\Redis\SSUBSCRIBE;
 
 class WorkerAvailabilityService
 {
@@ -46,11 +45,15 @@ class WorkerAvailabilityService
 
     public function updateLocation(User $worker, $latitude, string $longitude)
     {
-        $currentService = $worker->requests()
+        // Accepted jobs are keyed by worker_id — User::requests() is the client side (user_id).
+        $currentService = Request::query()
+            ->where('worker_id', $worker->id)
             ->where('status', RequestStatus::ACCEPTED)
             ->first();
 
-        if (!$currentService) return null;
+        if (! $currentService) {
+            return null;
+        }
 
         $profile = $worker->workerProfile;
         $profile->latitude = $latitude;

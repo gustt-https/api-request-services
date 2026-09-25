@@ -46,6 +46,7 @@ class RequestResourcePreview extends JsonResource
                 fn () => [
                     'id' => $this->service_package_id,
                     'name' => $this->package_name,
+                    'includes' => $this->relationLoaded('servicePackage') ? ($this->servicePackage?->includes ?? []) : [],
                 ],
             ),
             'timestamps' => $this->lifecycleTimestamps(),

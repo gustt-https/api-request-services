@@ -33,6 +33,13 @@ class WorkerServicesCompletedResource extends JsonResource
                 'complement' => $this->request->complement,
             ],
             'price' => (string) $this->request->price,
+            'package' => $this->request->service_package_id !== null || $this->request->package_name !== null
+                ? [
+                    'id' => $this->request->service_package_id,
+                    'name' => $this->request->package_name ?? $this->request->servicePackage?->name,
+                    'includes' => $this->request->servicePackage?->includes ?? [],
+                ]
+                : null,
             'timestamps' => [
                 'created_at' => $this->created_at,
                 'accepted_at' => $this->accepted_at,
